@@ -114,7 +114,6 @@ class MinesweeperModel {
             for (let j = 0; j < width; ++j)
                 this.model[i][j] = new MinesweeperCell();
         }
-
         this.targets = targets;
         this.mineDensity = mineDensity;
     }
@@ -124,25 +123,51 @@ class MinesweeperModel {
     }
 
     open(x, y) {
-        //  check out of bounds
-        if (!(0 <= x && x < this.width && 0 <= y && y < this.height))
-            return;
-
         var cell = this.model[y][x];
         if (cell.isOpen) {
-            //  todo implement "check adjacent flags and open adjacent closed"
+            //  check adjacent flags and open adjacent closed
+            let filteredTargets = this.filterTargetsOnPoint(x, y);
+            let countOpenBombs = filteredTargets.filter(t => this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1).length;
+            let countFlagged = filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged).length;
+            if (countFlagged + countOpenBombs === cell.value) {
+                //  open the unopened and unflagged
+                filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.open(x + t.x, y + t.y));
+                //  unflag incorrect flags
+                filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged && this.model[y + t.y][x + t.x].value !== -1).map(t => this.flag(x + t.x, y + t.y));
+            }
+
             return;
         }
 
+        //  set cell to open
         cell.isOpen = true;
 
+        //  cascade
         if (cell.value === 0) {
-            var filteredTargets = this.filterTargetsOnPoint(x, y);
+            let filteredTargets = this.filterTargetsOnPoint(x, y);
             filteredTargets.map(t => this.open(x + t.x, y + t.y));
         }
     }
 
     flag(x, y) {
+        if (this.model[y][x].isOpen) {
+            let filteredClosedTargets = this.filterTargetsOnPoint(x, y).filter(t => !(this.model[y + t.y][x + t.x].isOpen));
+            let countClosed = filteredClosedTargets.length;
+            if (countClosed === this.model[y][x].value) {
+                let countClosedFlagged = filteredClosedTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged).length;
+                if (countClosedFlagged === 0 || countClosedFlagged == this.model[y][x].value) {
+                    //  flag all or flag none
+                    filteredClosedTargets.map(t => this.flag(x + t.x, y + t.y));
+                } else {
+                    //  flag the unflagged
+                    filteredClosedTargets.map(t => !(this.model[y + t.y][x + t.x].isFlagged) && this.flag(x + t.x, y + t.y));
+                }
+
+            }
+
+            return;
+        }
+
         this.model[y][x].isFlagged = !this.model[y][x].isFlagged;
     }
 

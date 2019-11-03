@@ -10,6 +10,7 @@ Item {
     property var minesweeperModel: new MSLogic.MinesweeperModel(8, 8, MSTarget.Normal, 0.12)
 
 
+    //  todo generalise with a settings scene
 
     width: grid.width
     height: grid.height
@@ -32,6 +33,10 @@ Item {
                     updateGrid();
                 }
                 onRightClicked: {
+                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.rows))
+                    updateGrid();
+                }
+                onPressAndHold: {
                     minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.rows))
                     updateGrid();
                 }

@@ -6,6 +6,7 @@ Rectangle {
 
     signal clicked()
     signal rightClicked()
+    signal pressAndHold()
     signal entered()
     signal exited()
 
@@ -40,6 +41,7 @@ Rectangle {
             else if (mouse.button === Qt.RightButton)    //  won't work on mobile
                 square.rightClicked();
         }
+        onPressAndHold: square.pressAndHold()
 
         onEntered: square.entered()
         onExited: square.exited()
