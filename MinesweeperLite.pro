@@ -61,4 +61,4 @@ macx {
 
 DISTFILES += \
     ../../GitHub/MinesweeperLite/qml/MinesweeperBoard.qml \
-    ../../GitHub/MinesweeperLite/qml/MinesweeperTarget.js
+    ../../GitHub/MinesweeperLite/qml/MSTarget.js

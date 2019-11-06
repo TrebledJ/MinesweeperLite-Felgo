@@ -13,8 +13,7 @@ Rectangle {
     property bool isOpen: false
     property bool isFlagged: false
     property int value: 0
-    property string debugData
-    property alias mouseArea: mouseArea
+//    property alias mouseArea: mouseArea
 
     color: {
         if (isOpen) {
@@ -61,10 +60,10 @@ Rectangle {
     }
 
     onValueChanged: {
-//        console.log('value changed:', value)
+
     }
 
     onEntered: {
-        rectangle.setDebugText(debugData);
+
     }
 }

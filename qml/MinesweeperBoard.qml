@@ -1,22 +1,29 @@
 import Felgo 3.0
 import QtQuick 2.0
 
-import "MinesweeperLogic.js" as MSLogic
-import "MinesweeperTarget.js" as MSTarget
+import "MSLogic.js" as MSLogic
+import "MSTarget.js" as MSTarget
 
 Item {
     id: item
 
-    property var minesweeperModel: new MSLogic.MinesweeperModel(8, 8, MSTarget.Normal, 0.12)
+    property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.Normal, 0.12)
+    property alias grid: grid
 
-
+    //  todo introduce pinch-zoom, drag-move gui features
     //  todo generalise with a settings scene
 
     width: grid.width
     height: grid.height
 
+
+    Component.onCompleted: {
+
+    }
+
     Grid {
         id: grid
+
         rows: 8
         columns: 8
         spacing: 2
@@ -45,8 +52,9 @@ Item {
     }
 
     function updateGrid() {
-        for (let i = 0; i < grid.rows; ++i)
-            for (let j = 0; j < grid.columns; ++j) {
+        var i, j;
+        for (i = 0; i < grid.rows; ++i)
+            for (j = 0; j < grid.columns; ++j) {
                 gridRepeater.itemAt(i*grid.columns + j).isOpen = minesweeperModel.model[i][j].isOpen;
                 gridRepeater.itemAt(i*grid.columns + j).isFlagged = minesweeperModel.model[i][j].isFlagged;
                 gridRepeater.itemAt(i*grid.columns + j).value = minesweeperModel.model[i][j].value;
