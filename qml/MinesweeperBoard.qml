@@ -3,22 +3,21 @@ import QtQuick 2.0
 
 import "MSLogic.js" as MSLogic
 import "MSTarget.js" as MSTarget
+import "MSEnum.js" as MSEnum
 
 Item {
     id: item
 
-    property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.Normal, 0.12)
+    property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.target[mode], 0.12)
     property alias grid: grid
-
-    //  todo introduce pinch-zoom, drag-move gui features
-    //  todo generalise with a settings scene
+    property var difficulty
+    property var mode
 
     width: grid.width
     height: grid.height
 
-
     Component.onCompleted: {
-
+        console.log('from MSBoard.qml:', MSEnum.Mode.Normal)
     }
 
     Grid {

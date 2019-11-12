@@ -36,9 +36,9 @@ class MSModel {
         if (cell.isOpen) {
             //  check adjacent flags and open adjacent closed
             let filteredTargets = this.filterTargetsOnPoint(x, y);
-            let countOpenBombs = filteredTargets.filter(t => this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1).length;
-            let countFlagged = filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged).length;
-            if (countFlagged + countOpenBombs === cell.value) {
+            let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1) * t.weight, 0);
+            let valueFlagged = filteredTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
+            if (valueFlagged + valueOpenBombs === cell.value) {
                 //  open the unopened and unflagged
                 filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.open(x + t.x, y + t.y));
                 //  unflag incorrect flags
@@ -60,13 +60,16 @@ class MSModel {
     flag(x, y) {
         if (this.model[y][x].isOpen) {
             let filteredTargets = this.filterTargetsOnPoint(x, y);
-            let filteredClosedTargets = filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isOpen));
-            let countOpenBombs = filteredTargets.filter(t => this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1).length;
-            let countClosed = filteredClosedTargets.length;
-            if (countClosed + countOpenBombs === this.model[y][x].value) {
-                let countClosedFlagged = filteredClosedTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged).length;
-                if (countClosedFlagged === 0 || countOpenBombs + countClosedFlagged == this.model[y][x].value) {
-                    //  flag all or flag none
+            let filteredClosedTargets = filteredTargets.filter(t => !this.model[y + t.y][x + t.x].isOpen);
+            let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1) * t.weight, 0);
+            let valueClosed = filteredClosedTargets.reduce((acc, t) => acc + t.weight, 0);
+
+            //  execute flagging if value of closed cells and value of open bombs add up to clicked cell's value
+            if (valueClosed + valueOpenBombs === this.model[y][x].value) {
+                let valueClosedFlagged = filteredClosedTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
+                //  none are flagged or all are flagged
+                if (valueClosedFlagged === 0 || valueOpenBombs + valueClosedFlagged == this.model[y][x].value) {
+                    //  flag all or unflag all
                     filteredClosedTargets.map(t => this.flag(x + t.x, y + t.y));
                 } else {
                     //  flag the unflagged
@@ -99,7 +102,7 @@ class MSModel {
         //  set value for leftovers
         for (let i = 0; i < array.length; ++i) {
             let filteredTargets = this.filterTargetsOnPoint(array[i].x, array[i].y);
-            let count = filteredTargets.filter(t => this.model[array[i].y + t.y][array[i].x + t.x].value === -1).length;
+            let count = filteredTargets.reduce((acc, t) => acc + (this.model[array[i].y + t.y][array[i].x + t.x].value === -1) * t.weight, 0);
             this.model[array[i].y][array[i].x].value = count;
         }
     }

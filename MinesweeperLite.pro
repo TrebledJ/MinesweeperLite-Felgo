@@ -61,4 +61,10 @@ macx {
 
 DISTFILES += \
     ../../GitHub/MinesweeperLite/qml/MinesweeperBoard.qml \
-    ../../GitHub/MinesweeperLite/qml/MSTarget.js
+    ../../GitHub/MinesweeperLite/qml/MSTarget.js \
+    ../../GitHub/MinesweeperLite/qml/MSLogic.js \
+    ../../GitHub/MinesweeperLite/qml/SettingsScene.qml \
+    ../../GitHub/MinesweeperLite/qml/MinesweeperScene.qml \
+    ../../GitHub/MinesweeperLite/qml/BubbleButton.qml \
+    ../../GitHub/MinesweeperLite/qml/TextBase.qml \
+    ../../GitHub/MinesweeperLite/qml/MSEnum.js

@@ -8,13 +8,29 @@ class Target {
     }
 }
 
-var Normal = [
-    new Target(Qt.point(-1, -1), 1),
-    new Target(Qt.point(+0, -1), 1),
-    new Target(Qt.point(+1, -1), 1),
-    new Target(Qt.point(-1, +0), 1),
-    new Target(Qt.point(+1, +0), 1),
-    new Target(Qt.point(-1, +1), 1),
-    new Target(Qt.point(+0, +1), 1),
-    new Target(Qt.point(+1, +1), 1),
-]
+const Normal = [
+            new Target(Qt.point(-1, -1), 1),
+            new Target(Qt.point(+0, -1), 1),
+            new Target(Qt.point(+1, -1), 1),
+            new Target(Qt.point(-1, +0), 1),
+            new Target(Qt.point(+1, +0), 1),
+            new Target(Qt.point(-1, +1), 1),
+            new Target(Qt.point(+0, +1), 1),
+            new Target(Qt.point(+1, +1), 1),
+        ];
+
+const Doubled = [
+            new Target(Qt.point(-1, -1), 1),
+            new Target(Qt.point(+0, -1), 2),
+            new Target(Qt.point(+1, -1), 1),
+            new Target(Qt.point(-1, +0), 2),
+            new Target(Qt.point(+1, +0), 2),
+            new Target(Qt.point(-1, +1), 1),
+            new Target(Qt.point(+0, +1), 2),
+            new Target(Qt.point(+1, +1), 1),
+        ];
+
+const target = {
+    Normal,
+    Doubled,
+};
