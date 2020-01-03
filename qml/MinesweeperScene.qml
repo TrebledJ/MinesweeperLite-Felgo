@@ -1,10 +1,10 @@
 import Felgo 3.0
-import QtQuick 2.0
+import QtQuick 2.13
 
 Scene {
     id: scene
 
-    property alias minesweeperBoard: minesweeperBoard
+//    property alias minesweeperBoard: minesweeperBoard
 
     signal gotoSettings()
 
@@ -16,7 +16,7 @@ Scene {
     opacity: 0
 
     Component.onCompleted: {
-        minesweeperBoard.generate();
+//        minesweeperBoard.generate();
     }
 
     // background rectangle matching the logical scene size (= safe zone available on all devices)
@@ -48,153 +48,138 @@ Scene {
                 id: stage
                 width: parent.width
                 height: background.height - topBar.height - bottomBar.height
-                color: "transparent"
+                color: "green"
+                opacity: 0.5
 
-                Item {
-                    id: staticWrapper
-                    anchors.centerIn: parent
-                    width: wrapper.width
-                    height: wrapper.height
+                scale: 0.25
+
+
+
+                Rectangle {
+                    id: dragWrapper
+                    x: -stage.width
+                    y: -stage.height
+                    width: 3 * stage.width
+                    height: 3 * stage.height
+//                    width: Math.max(wrapper.width * wrapper.scale, stage.width) + 2 * stage.width
+//                    height: Math.max(wrapper.height * wrapper.scale, stage.height) + 2 * stage.height
+                    color: 'blue'
+                    opacity: 0.25
+
+                    DragHandler {
+    //                    xAxis.minimum: (wrapper.width * wrapper.scale >= stage.width) ? -stage.width - wrapper.width * wrapper.scale + 20 : -stage.width
+    //                    xAxis.maximum: (wrapper.width * wrapper.scale >= stage.width) ? -20 : -stage.width
+                        yAxis.enabled: false
+//                        onActiveChanged: {
+//                            console.warn('dragHandler.active=%1'.arg(active));
+//                            if (active) {
+//                                const initialX = wrapper.x;
+////                                wrapper.x = Qt.binding(function() {
+////                                    console.log('dragWrapper.x=%1'.arg(dragWrapper.x))
+////                                    console.log('initialX=%1; translation.x=%2'.arg(initialX).arg(translation.x));
+////                                    return initialX + translation.x;
+////                                })
+//                            } else {
+//                                const finalX = wrapper.x;
+//                                wrapper.x = finalX;
+//                            }
+//                        }
+                    }   //  DragHandler
 
                     Item {
                         id: wrapper
+//                        x: (dragWrapper.width - width)/2
+//                        y: (dragWrapper.height - height)/2
+                        width: rect.width
+                        height: rect.height
 
-                        function snapToView() {
-                            let realX = staticWrapper.x + wrapper.x;
-                            let realY = staticWrapper.y + wrapper.y;
-                            let wrapperRealWidth = wrapper.width * tform.xScale;
-                            let wrapperRealHeight = wrapper.height * tform.yScale;
+//                        Component.onCompleted: {
+//                            x = (dragWrapper.width - width) / 2;
+//                            y = (dragWrapper.height - height) / 2;
+//                        }
 
-                            let leftMargin = realX;
-                            let rightMargin = stage.width - (realX + wrapperRealWidth);
-                            let topMargin = realY;
-                            let bottomMargin = stage.height - (realY + wrapperRealHeight);
+                        Rectangle {
+                            id: rect
+                            width: 100
+                            height: 100
+                            color: 'red'
+                            opacity: 0.8
 
-                            //  modify this value to change the size of the margin
-                            let threshold = 10;
+//                            Rectangle {
+//                                x: 0
+//                                y: 0
+//                                width: 20
+//                                height: 20
+//                                color: 'black'
+//                            }
 
-                            //console.log('leftMargin=%1, rightMargin=%2'.arg(leftMargin).arg(rightMargin));
-                            //console.log('topMargin=%1, bottomMargin=%2'.arg(topMargin).arg(bottomMargin));
-
-                            //  snap wrapper.x and wrapper.y against the background
-                            if (leftMargin < 0 && rightMargin > threshold) {
-                                if (wrapperRealWidth < stage.width - 2*threshold) {
-                                    //  wrapper fits within left + right thresholds
-                                    wrapper.x = (staticWrapper.width - wrapperRealWidth) / 2;
-                                    console.log('wrapper fits within 2 x thresholds');
-                                } else {
-                                    wrapper.x = stage.width - threshold - wrapperRealWidth - staticWrapper.x;
-                                    console.log('wrapper does not fit within 2 x thresholds');
-                                }
-                                console.log('readjusting wrapper.x:', wrapper.x);
-                            }
-                            if (rightMargin < 0 && leftMargin > threshold) {
-                                if (wrapperRealWidth < stage.width - 2*threshold) {
-                                    wrapper.x = (staticWrapper.width - wrapperRealWidth) / 2;
-                                    console.log('wrapper fits within 2 x thresholds');
-                                } else {
-                                    wrapper.x = threshold - staticWrapper.x;
-                                    console.log('wrapper does not fit within 2 x thresholds');
-                                }
-                                console.log('readjusting wrapper.x:', wrapper.x);
-                            }
-                            if (topMargin < 0 && bottomMargin > threshold) {
-                                if (wrapperRealHeight < stage.height - 2*threshold) {
-                                    //  wrapper fits within top + bottom thresholds
-                                    wrapper.y = (staticWrapper.height - wrapperRealHeight) / 2;
-                                    console.log('wrapper fits within 2 y thresholds');
-                                } else {
-                                    wrapper.y = stage.height- threshold - wrapperRealHeight - staticWrapper.y;
-                                    console.log('wrapper does not fit within 2 y thresholds');
-                                }
-                                console.log('readjusting wrapper.y:', wrapper.y);
-                            }
-                            if (bottomMargin < 0 && topMargin > threshold) {
-                                if (wrapperRealHeight < stage.height - 2*threshold) {
-                                    wrapper.y = (staticWrapper.height - wrapperRealHeight) / 2;
-                                    console.log('wrapper fits within 2 y thresholds');
-                                } else {
-                                    wrapper.y = threshold - staticWrapper.y;
-                                    console.log('wrapper does not fit within 2 y thresholds');
-                                }
-                                console.log('readjusting wrapper.y:', wrapper.y);
-                            }
+//                            Rectangle {
+//                                x: 20
+//                                y: 20
+//                                width: 20
+//                                height: 20
+//                                color: 'yellow'
+//                            }
                         }
 
-                        x: (parent.width - width) / 2
-                        y: (parent.height - height) / 2
-                        width: minesweeperBoard.width
-                        height: minesweeperBoard.height
-
-                        MinesweeperBoard {
-                            id: minesweeperBoard
-
-                            function generate() {
-                                minesweeperModel.generateBombs();
-                                updateGrid();
-                            }
-                        }
-
-                        Item {
-                            id: proxy
-                            //  used as a dummy for the pinchArea to take effect but propagates scaling to wrapper
-
-                            onScaleChanged: {
-                                let zoomFactor = pinchArea.scale / pinchArea.previousScale;
-                                let realX = pinchArea.center.x * tform.xScale;
-                                let realY = pinchArea.center.y * tform.yScale;
-                                wrapper.x += (1 - zoomFactor) * realX;
-                                wrapper.y += (1 - zoomFactor) * realY;
-                                tform.xScale *= zoomFactor;
-                                tform.yScale *= zoomFactor;
-                            }
-                        }
-
-                        PinchArea {
-                            id: pinchArea
-                            property point center
-                            property double previousScale: 1.0
-                            property double scale: 1.0
-
-                            anchors.fill: parent
-                            pinch.target: proxy
-                            pinch.minimumScale: 1
-                            pinch.maximumScale: 10
-                            onPinchStarted: {
-                                center = pinch.center;
-                                previousScale = pinch.previousScale;
-                                scale = pinch.scale;
-                            }
-                            onPinchUpdated: {
-                                center = pinch.center;
-                                previousScale = pinch.previousScale;
-                                scale = pinch.scale;
-                            }
-                            onPinchFinished: {
-                                previousScale = 1.0;
-                                scale = 1.0;
-
-                                wrapper.snapToView();
-                            }
-                        }   //  PinchArea
-
-                        transform: Scale {
-                            id: tform
-                        }
                     }   //  Item: wrapper
-                }   //  Item: staticWrapper
 
-                MouseArea {
-                    anchors.fill: parent
-                    propagateComposedEvents: true
-                    drag.target: wrapper
-                    drag.axis: Drag.XAndYAxis
-                    onReleased: {
-                        wrapper.snapToView();
+
+
+
+//                    Rectangle {
+//                        x: pinchHandler.centroid.position.x - width/2
+//                        y: pinchHandler.centroid.position.y - height/2
+//                        width: 16
+//                        height: 16
+//                        radius: width/2
+//                        color: 'black'
+//                    }
+
+                }   //  Rectangle: dragWrapper
+
+
+                PinchHandler {
+                    id: pinchHandler
+                    target: wrapper
+                    xAxis.enabled: false
+                    yAxis.enabled: false
+                    minimumRotation: 0
+                    maximumRotation: 0
+
+                    onActiveChanged: {
+                        console.warn('pinchHandler.active=%1'.arg(active))
+                        if (!active) {
+                            //  resize dragWrapper
+
+                            const relativeWrapperX = wrapper.x / wrapper.scale;
+                            const relativeWrapperY = wrapper.y / wrapper.scale;
+
+                            const absoluteWrapperX = relativeWrapperX + dragWrapper.x;
+                            const absoluteWrapperY = relativeWrapperY + dragWrapper.y;
+
+                            console.log('relative.x=%1; .y=%2'.arg(relativeWrapperX).arg(relativeWrapperY))
+                            console.log('absolute.x=%1; .y=%2'.arg(absoluteWrapperX).arg(absoluteWrapperY))
+
+                            //  reposition wrapper within dragWrapper
+//                                wrapper.x = (dragWrapper.width - wrapper.width) / 2;
+//                                wrapper.y = (dragWrapper.height - wrapper.height) / 2;
+                        }
                     }
-                }   //  MouseArea
+
+                    onScaleChanged: {
+                        console.log('pinchHandler.scale=%1'.arg(pinchHandler.scale))
+                    }
+
+                    onActiveScaleChanged: {
+                        console.log('pinchHandler.activeScale=%1'.arg(pinchHandler.activeScale))
+                    }
+                }   //  PinchHandler
+
+
 
             }   //  Rectangle: stage
+
 
             Rectangle {
                 id: bottomBar

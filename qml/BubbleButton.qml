@@ -21,7 +21,6 @@ Item {
 	property alias font: buttonText.font
 	property alias background: background
 	property alias mouseArea: mouseArea
-//	property alias textObj: buttonText
 	property alias image: image
 	
 	property bool bubbleOn: true

@@ -42,10 +42,10 @@ Item {
                     minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.rows))
                     updateGrid();
                 }
-                onPressAndHold: {
-                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.rows))
-                    updateGrid();
-                }
+//                onPressAndHold: {
+//                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.rows))
+//                    updateGrid();
+//                }
             }
         }
     }

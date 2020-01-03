@@ -38,7 +38,9 @@ RESOURCES += #    resources.qrc # uncomment for publishing
 
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    ../../GitHub/MinesweeperLite/mscell.cpp \
+    ../../GitHub/MinesweeperLite/msmodel.cpp
 
 
 android {
@@ -68,3 +70,7 @@ DISTFILES += \
     ../../GitHub/MinesweeperLite/qml/BubbleButton.qml \
     ../../GitHub/MinesweeperLite/qml/TextBase.qml \
     ../../GitHub/MinesweeperLite/qml/MSEnum.js
+
+HEADERS += \
+    ../../GitHub/MinesweeperLite/mscell.h \
+    ../../GitHub/MinesweeperLite/msmodel.h

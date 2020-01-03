@@ -34,6 +34,7 @@ Rectangle {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: true
         propagateComposedEvents: false
+//        preventStealing: true
         onClicked: {
             if (mouse.button === Qt.LeftButton)
                 square.clicked();

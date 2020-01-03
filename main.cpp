@@ -1,3 +1,6 @@
+
+#include "msmodel.h"
+
 #include <QApplication>
 #include <FelgoApplication>
 
@@ -31,6 +34,8 @@ int main(int argc, char *argv[])
     // felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
 
     engine.load(QUrl(felgo.mainQmlFileName()));
+
+    qmlRegisterType<MSModel>("mslite.ext", 1, 0, "MSModel");
 
     return app.exec();
 }
