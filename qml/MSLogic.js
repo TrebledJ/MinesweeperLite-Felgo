@@ -37,8 +37,8 @@ class MSModel {
             //  check adjacent flags and open adjacent closed
             let filteredTargets = this.filterTargetsOnPoint(x, y);
             let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].value === -1) * t.weight, 0);
-            let valueFlagged = filteredTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
-            if (valueFlagged + valueOpenBombs === cell.value) {
+            let valueClosedFlagged = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isFlagged && !this.model[y+t.y][x+t.x].isOpen) * t.weight, 0);
+            if (valueClosedFlagged + valueOpenBombs === cell.value) {
                 //  open the unopened and unflagged
                 filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.open(x + t.x, y + t.y));
                 //  unflag incorrect flags
@@ -68,7 +68,7 @@ class MSModel {
             if (valueClosed + valueOpenBombs === this.model[y][x].value) {
                 let valueClosedFlagged = filteredClosedTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
                 //  none are flagged or all are flagged
-                if (valueClosedFlagged === 0 || valueOpenBombs + valueClosedFlagged == this.model[y][x].value) {
+                if (valueClosedFlagged === 0 || valueOpenBombs + valueClosedFlagged === this.model[y][x].value) {
                     //  flag all or unflag all
                     filteredClosedTargets.map(t => this.flag(x + t.x, y + t.y));
                 } else {
@@ -84,21 +84,33 @@ class MSModel {
         this.model[y][x].isFlagged = !this.model[y][x].isFlagged;
     }
 
-    generateBombs() {
+    /**
+      @brief: resets grid and generates bombs, whitelisted indices will never have bombs
+      @param whitelist: Array[Number]: indices of the grid (row-major) to exclude when generating bombs
+    **/
+    generateBombs(whitelist = []) {
         //  reset squares
         this.reset();
 
         var array = new Array(this.width * this.height);
-        for (let i = 0; i < this.width * this.height; ++i)
-            array[i] = Qt.point(i % this.width, Math.floor(i / this.height));
+        for (let i = 0; i < this.width * this.height; ++i) {
+            if (!whitelist.includes(i))
+                array[i] = Qt.point(i % this.width, Math.floor(i / this.width));
+        }
 
         //  set bombs
-        for (let i = 0; i < 0.1 * this.width * this.height; ++i) {
+        let numBombs = Math.floor(this.mineDensity * this.width * this.height);
+        for (let i = 0; i < numBombs; ++i) {
             let randomIndex = randomInt(0, array.length);
             this.model[array[randomIndex].y][array[randomIndex].x].value = -1;
             array.splice(randomIndex, 1);
         }
 
+
+        //  add whitelist to array
+        for (let i = 0; i < whitelist.length; ++i) {
+            array.push(Qt.point(whitelist[i] % this.width, Math.floor(whitelist[i] / this.width)));
+        }
         //  set value for leftovers
         for (let i = 0; i < array.length; ++i) {
             let filteredTargets = this.filterTargetsOnPoint(array[i].x, array[i].y);
@@ -107,14 +119,36 @@ class MSModel {
         }
     }
 
+    setDimensions(width, height) {
+        this.width = width;
+        this.height = height;
+        this.model = new Array(height);
+        for (let i = 0; i < height; ++i) {
+            this.model[i] = new Array(width);
+            for (let j = 0; j < width; ++j)
+                this.model[i][j] = new MSCell();
+        }
+    }
+
     reset() {
-        console.log('reseting board');
+        console.log("reseting board");
         for (let i = 0; i < this.height; ++i) {
             for (let j = 0; j < this.width; ++j) {
                 this.model[i][j].isOpen = false;
                 this.model[i][j].isFlagged = false;
                 this.model[i][j].value = 0;
             }
+        }
+    }
+
+    debug() {
+        console.log('.width=%1, .height=%2'.arg(this.width).arg(this.height));
+        for (let i = 0; i < this.height; ++i) {
+            let str = '';
+            for (let j = 0; j < this.width; ++j) {
+                str += this.model[i][j].value + ' ';
+            }
+            console.log(str);
         }
     }
 }

@@ -71,7 +71,7 @@ Scene {
                             let bottomMargin = stage.height - (realY + wrapperRealHeight);
 
                             //  modify this value to change the size of the margin
-                            let threshold = 10;
+                            let threshold = 20;
 
                             //console.log('leftMargin=%1, rightMargin=%2'.arg(leftMargin).arg(rightMargin));
                             //console.log('topMargin=%1, bottomMargin=%2'.arg(topMargin).arg(bottomMargin));
@@ -128,11 +128,8 @@ Scene {
 
                         MinesweeperBoard {
                             id: minesweeperBoard
-
-                            function generate() {
-                                minesweeperModel.generateBombs();
-                                updateGrid();
-                            }
+                            defaultWidth: stage.width * 7/8
+                            defaultHeight: stage.height * 7/8
                         }
 
                         Item {
@@ -207,7 +204,14 @@ Scene {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: minesweeperBoard.generate()
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: {
+                        if (mouse.button === Qt.RightButton) {
+                            minesweeperBoard.minesweeperModel.debug()
+                        } else {
+                            minesweeperBoard.generate()
+                        }
+                    }
                 }
             }   //  Rectangle: bottomBar
         }   //  Column

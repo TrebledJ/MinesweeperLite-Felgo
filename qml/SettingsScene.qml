@@ -1,3 +1,6 @@
+/**
+  This scene allows the user to modify minesweeper settings.
+**/
 import Felgo 3.0
 import QtQuick 2.12
 
@@ -43,6 +46,7 @@ Scene {
                 spacing: 20
 
                 BubbleButton {
+                    //  modifies the difficulty
                     width: 130
                     height: 40
                     text: "Difficulty: " + MSEnum.Difficulty.index(difficultyIndex)
@@ -53,6 +57,7 @@ Scene {
                 }
 
                 BubbleButton {
+                    //  modifies the mode
                     width: 130
                     height: 40
                     text: "Mode: " + MSEnum.Mode.index(modeIndex)

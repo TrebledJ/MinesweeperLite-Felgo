@@ -60,6 +60,7 @@ macx {
 }
 
 DISTFILES += \
+    ../../GitHub/MinesweeperLite/qml/MSUtils.js \
     ../../GitHub/MinesweeperLite/qml/MinesweeperBoard.qml \
     ../../GitHub/MinesweeperLite/qml/MSTarget.js \
     ../../GitHub/MinesweeperLite/qml/MSLogic.js \

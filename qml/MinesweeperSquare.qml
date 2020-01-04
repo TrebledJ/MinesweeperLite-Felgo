@@ -1,6 +1,8 @@
 import Felgo 3.0
 import QtQuick 2.0
 
+import "MSUtils.js" as MSUtils
+
 Rectangle {
     id: square
 
@@ -53,8 +55,8 @@ Rectangle {
 
     Text {
         anchors.centerIn: parent
-        color: 'black'
-        font.pointSize: 16
+        color: MSUtils.getValueColor(value)
+        font.pointSize: 16 * grid.squareSize / 30
         text: isOpen ? (value > 0) ? value : '' : ''
 //        text: value
     }
