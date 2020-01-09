@@ -22,8 +22,8 @@ GameWindow {
 
     MinesweeperScene {
         id: minesweeperScene
-        minesweeperBoard.difficulty: MSEnum.Difficulty.index(settingsScene.difficultyIndex)
-        minesweeperBoard.mode: MSEnum.Mode.index(settingsScene.modeIndex)
+//        minesweeperBoard.difficulty: MSEnum.Difficulty.index(settingsScene.difficultyIndex)
+//        minesweeperBoard.mode: MSEnum.Mode.index(settingsScene.modeIndex)
         onGotoSettings: {
             gameWindow.state = "settingsScene";
         }
@@ -36,7 +36,7 @@ GameWindow {
         }
     }
 
-    state: "settingsScene"
+    state: "minesweeperScene"
     states: [
         State {
             name: "minesweeperScene"

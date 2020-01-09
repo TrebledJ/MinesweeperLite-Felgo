@@ -8,6 +8,7 @@ Rectangle {
 
     signal clicked()
     signal rightClicked()
+    signal doubleClicked()
     signal pressAndHold()
     signal entered()
     signal exited()
@@ -20,7 +21,7 @@ Rectangle {
     color: {
         if (isOpen) {
             if (value === -1)
-                return 'darkgrey';
+                return 'crimson';
             else
                 return 'darkturquoise';
         } else if (isFlagged) {
@@ -42,6 +43,7 @@ Rectangle {
             else if (mouse.button === Qt.RightButton)    //  won't work on mobile
                 square.rightClicked();
         }
+        onDoubleClicked: square.doubleClicked()
         onPressAndHold: square.pressAndHold()
 
         onEntered: square.entered()

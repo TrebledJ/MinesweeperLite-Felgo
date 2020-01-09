@@ -6,10 +6,13 @@ import "MSTarget.js" as MSTarget
 import "MSEnum.js" as MSEnum
 
 Item {
-    id: item
+    id: minesweeperBoard
 
-    property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.target[mode], 0.12)
+    signal clicked()
+
+    property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.target["Normal"], 0.12)
     property alias grid: grid
+    property int flagsLeft: minesweeperModel.flagsLeft()
     property var difficulty: MSEnum.Difficulty.Beginner
     property var mode: MSEnum.Mode.Normal
 
@@ -18,42 +21,6 @@ Item {
 
     width: grid.width
     height: grid.height
-
-    Component.onCompleted: {
-        console.log('from MSBoard.qml:', MSEnum.Mode.Normal)
-    }
-
-    Grid {
-        id: grid
-
-        property real squareSize: Math.min((defaultWidth - (grid.columns-1)*grid.spacing)/grid.columns, (defaultHeight - (grid.rows-1)*grid.spacing)/grid.rows)
-
-        rows: minesweeperModel.height
-        columns: minesweeperModel.width
-        spacing: 2 * (8 / Math.min(grid.columns, grid.rows))
-
-        Repeater {
-            id: gridRepeater
-            model: grid.rows * grid.columns
-            MinesweeperSquare {
-                width: grid.squareSize
-                height: grid.squareSize
-
-                onClicked: {
-                    minesweeperModel.open(index % grid.columns, Math.floor(index / grid.columns));
-                    updateGrid();
-                }
-                onRightClicked: {
-                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
-                    updateGrid();
-                }
-                onPressAndHold: {
-                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
-                    updateGrid();
-                }
-            }
-        }
-    }
 
     function generate() {
         updateModel();
@@ -75,11 +42,17 @@ Item {
             //  TODO add custom dimensions/density
             console.warn("'Difficulty: Custom' has not yet been implemented.");
         }
+        minesweeperModel.targets = MSTarget.target[mode];
+        if (mode === MSEnum.Mode.Swath) {
+            console.log('Swath detected')
+            minesweeperModel.mineDensity /= 2;
+        }
     }
 
     function updateGrid() {
         grid.rows = minesweeperModel.height;
         grid.columns = minesweeperModel.width;
+        flagsLeft = minesweeperModel.flagsLeft();
 
         for (let i = 0; i < grid.rows; ++i)
             for (let j = 0; j < grid.columns; ++j) {
@@ -87,5 +60,56 @@ Item {
                 gridRepeater.itemAt(i*grid.columns + j).isFlagged = minesweeperModel.model[i][j].isFlagged;
                 gridRepeater.itemAt(i*grid.columns + j).value = minesweeperModel.model[i][j].value;
             }
+    }
+
+    Component.onCompleted: {
+        console.log('from MSBoard.qml:', MSEnum.Mode.Normal)
+    }
+
+    Grid {
+        id: grid
+
+        property real squareSize: Math.min((defaultWidth - (grid.columns-1)*grid.spacing)/grid.columns, (defaultHeight - (grid.rows-1)*grid.spacing)/grid.rows)
+
+        rows: minesweeperModel.height
+        columns: minesweeperModel.width
+        spacing: 2 * (8 / Math.min(grid.columns, grid.rows))
+
+        Repeater {
+            id: gridRepeater
+            model: grid.rows * grid.columns
+            MinesweeperSquare {
+                width: grid.squareSize
+                height: grid.squareSize
+
+                function open() {
+                    minesweeperModel.open(index % grid.columns, Math.floor(index / grid.columns));
+                    updateGrid();
+                }
+
+                function flag() {
+                    if (flagsLeft > 0) {
+                        minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
+                        updateGrid();
+                    }
+                }
+
+                onClicked: {
+                    if (!isFlagged)
+                        open();
+
+                    minesweeperBoard.clicked();
+                }
+                onRightClicked: {
+                    flag();
+                    minesweeperBoard.clicked();
+                }
+                onPressAndHold: {
+                    flag();
+                    minesweeperBoard.clicked();
+                }
+
+            }
+        }
     }
 }

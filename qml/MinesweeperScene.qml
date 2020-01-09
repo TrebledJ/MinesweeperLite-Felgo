@@ -1,10 +1,14 @@
 import Felgo 3.0
 import QtQuick 2.0
 
+import "MSEnum.js" as MSEnum
+
 Scene {
     id: scene
 
     property alias minesweeperBoard: minesweeperBoard
+    property int difficultyIndex
+    property int modeIndex
 
     signal gotoSettings()
 
@@ -15,8 +19,14 @@ Scene {
     visible: opacity != 0
     opacity: 0
 
-    Component.onCompleted: {
+    function newGame() {
         minesweeperBoard.generate();
+        clock.stop();
+        clock.timeTaken = 0;
+    }
+
+    Component.onCompleted: {
+        newGame();
     }
 
     // background rectangle matching the logical scene size (= safe zone available on all devices)
@@ -33,14 +43,58 @@ Scene {
                 id: topBar
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: 40
+                height: 60
                 z: 2
 
                 color: "goldenrod"
+//                color: "transparent"
 
-                MouseArea {
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: scene.gotoSettings()
+//                }
+
+                Row {
                     anchors.fill: parent
-                    onClicked: scene.gotoSettings()
+                    anchors.margins: 10
+                    spacing: 10
+
+                    Column {
+                        width: 140
+                        spacing: 4
+
+                        BubbleButton {
+                            //  modifies the difficulty
+                            width: parent.width
+                            height: 18
+                            text: "Difficulty: " + MSEnum.Difficulty.index(difficultyIndex)
+                            font.pointSize: 10
+                            onClicked: {
+                                difficultyIndex = (difficultyIndex + 1) % MSEnum.Difficulty.count;
+                            }
+                        }
+
+                        BubbleButton {
+                            //  modifies the mode
+                            width: parent.width
+                            height: 18
+                            text: "Mode: " + MSEnum.Mode.index(modeIndex)
+                            font.pointSize: 10
+                            onClicked: {
+                                modeIndex = (modeIndex + 1) % MSEnum.Mode.count;
+                            }
+                        }
+                    }
+
+                    BubbleButton {
+                        width: 140
+                        height: 40
+                        text: "New Game"
+                        font.pointSize: 12
+                        onClicked: {
+                            newGame();
+                        }
+                    }
                 }
             }   //  Rectangle: topBar
 
@@ -58,6 +112,11 @@ Scene {
 
                     Item {
                         id: wrapper
+
+                        x: (parent.width - width) / 2
+                        y: (parent.height - height) / 2
+                        width: minesweeperBoard.width
+                        height: minesweeperBoard.height
 
                         function snapToView() {
                             let realX = staticWrapper.x + wrapper.x;
@@ -121,15 +180,13 @@ Scene {
                             }
                         }
 
-                        x: (parent.width - width) / 2
-                        y: (parent.height - height) / 2
-                        width: minesweeperBoard.width
-                        height: minesweeperBoard.height
-
                         MinesweeperBoard {
                             id: minesweeperBoard
                             defaultWidth: stage.width * 7/8
                             defaultHeight: stage.height * 7/8
+                            difficulty: MSEnum.Difficulty.index(difficultyIndex)
+                            mode: MSEnum.Mode.index(modeIndex)
+                            onClicked: clock.start();
                         }
 
                         Item {
@@ -197,10 +254,10 @@ Scene {
                 id: bottomBar
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: 40
+                height: 60
                 z: 2
 
-                color: 'goldenrod'
+                color: "goldenrod"
 
                 MouseArea {
                     anchors.fill: parent
@@ -208,13 +265,52 @@ Scene {
                     onClicked: {
                         if (mouse.button === Qt.RightButton) {
                             minesweeperBoard.minesweeperModel.debug()
-                        } else {
-                            minesweeperBoard.generate()
+//                        } else {
+//                            minesweeperBoard.generate()
                         }
                     }
                 }
+
+                Row {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 10
+
+                    Rectangle {
+                        width: 140
+                        height: 40
+                        color: "yellow"
+                        TextBase {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            text: "Time: " + clock.timeTaken
+                        }
+                    }
+
+                    Rectangle {
+                        width: 140
+                        height: 40
+                        color: "yellow"
+                        TextBase {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            text: "Flags Left: " + minesweeperBoard.flagsLeft
+                        }
+                    }
+                }
+
             }   //  Rectangle: bottomBar
         }   //  Column
     }   //  Rectangle: background
+
+    Timer {
+        id: clock
+        property int timeTaken: 0
+        interval: 1000
+        repeat: true
+        onTriggered: timeTaken++
+    }
 
 }   //  Scene: scene
