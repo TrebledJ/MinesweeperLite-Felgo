@@ -1,14 +1,14 @@
 import Felgo 3.0
 import QtQuick 2.0
 
-import "MSEnum.js" as MSEnum
+import "../common"
+import "../settings"
+import "../js/MSEnum.js" as MSEnum
 
 Scene {
     id: scene
 
     property alias minesweeperBoard: minesweeperBoard
-    property int difficultyIndex
-    property int modeIndex
 
     signal gotoSettings()
 
@@ -16,8 +16,9 @@ Scene {
     width: 320
     height: 480
 
-    visible: opacity != 0
+    visible: opacity !== 0
     opacity: 0
+
 
     function newGame() {
         minesweeperBoard.generate();
@@ -25,9 +26,11 @@ Scene {
         clock.timeTaken = 0;
     }
 
+
     Component.onCompleted: {
         newGame();
     }
+
 
     // background rectangle matching the logical scene size (= safe zone available on all devices)
     // see here for more details on content scaling and safe zone: https://felgo.com/doc/felgo-different-screen-sizes/
@@ -67,10 +70,10 @@ Scene {
                             //  modifies the difficulty
                             width: parent.width
                             height: 18
-                            text: "Difficulty: " + MSEnum.Difficulty.index(difficultyIndex)
+                            text: "Difficulty: " + MSSettings.difficulty()
                             font.pointSize: 10
                             onClicked: {
-                                difficultyIndex = (difficultyIndex + 1) % MSEnum.Difficulty.count;
+                                MSSettings.incrementDifficultyIndex();
                             }
                         }
 
@@ -78,10 +81,10 @@ Scene {
                             //  modifies the mode
                             width: parent.width
                             height: 18
-                            text: "Mode: " + MSEnum.Mode.index(modeIndex)
+                            text: "Mode: " + MSSettings.mode()
                             font.pointSize: 10
                             onClicked: {
-                                modeIndex = (modeIndex + 1) % MSEnum.Mode.count;
+                                MSSettings.incrementModeIndex();
                             }
                         }
                     }
@@ -182,10 +185,16 @@ Scene {
 
                         MinesweeperBoard {
                             id: minesweeperBoard
+
+                            enabled: true
+                            opacity: enabled ? 1 : 0.8
+
                             defaultWidth: stage.width * 7/8
                             defaultHeight: stage.height * 7/8
-                            difficulty: MSEnum.Difficulty.index(difficultyIndex)
-                            mode: MSEnum.Mode.index(modeIndex)
+//                            difficulty: MSEnum.Difficulty.index(difficultyIndex)
+//                            mode: MSEnum.Mode.index(modeIndex)
+                            difficulty: MSEnum.Difficulty.index(MSSettings.difficultyIndex)
+                            mode: MSEnum.Mode.index(MSSettings.modeIndex)
                             onClicked: clock.start();
                         }
 
@@ -247,6 +256,11 @@ Scene {
                         wrapper.snapToView();
                     }
                 }   //  MouseArea
+
+                PauseOverlay {
+                    id: pauseOverlay
+                    anchors.fill: parent
+                }
 
             }   //  Rectangle: stage
 

@@ -1,7 +1,7 @@
 import Felgo 3.0
 import QtQuick 2.0
 
-import "MSUtils.js" as MSUtils
+import "../js/MSUtils.js" as MSUtils
 
 Rectangle {
     id: square

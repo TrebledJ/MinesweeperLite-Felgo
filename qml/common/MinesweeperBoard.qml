@@ -1,9 +1,9 @@
 import Felgo 3.0
 import QtQuick 2.0
 
-import "MSLogic.js" as MSLogic
-import "MSTarget.js" as MSTarget
-import "MSEnum.js" as MSEnum
+import "../js/MSLogic.js" as MSLogic
+import "../js/MSTarget.js" as MSTarget
+import "../js/MSEnum.js" as MSEnum
 
 Item {
     id: minesweeperBoard
