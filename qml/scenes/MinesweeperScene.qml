@@ -2,6 +2,7 @@ import Felgo 3.0
 import QtQuick 2.0
 
 import "../common"
+import "components"
 import "../settings"
 import "../js/MSEnum.js" as MSEnum
 
@@ -29,6 +30,7 @@ Scene {
 
     Component.onCompleted: {
         newGame();
+        minesweeperBoard.debug();
     }
 
 
@@ -42,6 +44,7 @@ Scene {
         Column {
             anchors.fill: parent
 
+//            /*
             Rectangle {
                 id: topBar
                 anchors.left: parent.left
@@ -100,6 +103,14 @@ Scene {
                     }
                 }
             }   //  Rectangle: topBar
+//            */
+
+//            MinesweeperTopBar {
+//                id: topBar
+//                anchors.left: parent.left
+//                anchors.right: parent.right
+//                height: 60
+//            }
 
             Rectangle {
                 id: stage
@@ -257,10 +268,10 @@ Scene {
                     }
                 }   //  MouseArea
 
-                PauseOverlay {
-                    id: pauseOverlay
-                    anchors.fill: parent
-                }
+//                PauseOverlay {
+//                    id: pauseOverlay
+//                    anchors.fill: parent
+//                }
 
             }   //  Rectangle: stage
 

@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Felgo 3.0
 
-import "../common"
+import "../../common"
 
 Item {
     id: item

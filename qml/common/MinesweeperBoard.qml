@@ -62,6 +62,10 @@ Item {
             }
     }
 
+    function debug() {
+        minesweeperModel.debug();
+    }
+
     Component.onCompleted: {
         console.log('from MSBoard.qml:', MSEnum.Mode.Normal)
     }

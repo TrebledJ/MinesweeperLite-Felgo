@@ -23,9 +23,7 @@ GameWindow {
     screenHeight: 960
 
     Component.onCompleted: {
-        console.warn("Settings.ready:", MSSettings.ready);
         MSSettings.settings = gameWindow.settings;
-//        MSSettings.ready = true;
     }
 
     MinesweeperScene {
