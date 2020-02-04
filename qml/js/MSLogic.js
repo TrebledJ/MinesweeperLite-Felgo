@@ -14,6 +14,7 @@ class MSCell {
     }
 }
 
+
 /**
   @brief    Generates a random integer in the range [low, high).
 **/
@@ -79,17 +80,16 @@ class MSModel {
     }
 
     flagsLeft() {
-        var flags = 0;
-        var openBombs = 0;
+        let flags = this.numBombs();
         for (let i = 0; i < this.height; ++i) {
             for (let j = 0; j < this.width; ++j) {
                 if (this.model[i][j].isFlagged && !this.model[i][j].isOpen)
-                    flags++;
+                    flags--;
                 if (this.model[i][j].isOpen && this.model[i][j].isBomb)
-                    openBombs++;
+                    flags--;
             }
         }
-        return this.numBombs() - flags - openBombs;
+        return flags;
     }
 
     __filterTargetsOnPoint(x, y) {
