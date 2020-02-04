@@ -1,10 +1,12 @@
 .pragma library
 
+.import "MSTarget.js" as MSTarget
+
 class MSCell {
-    constructor() {
-        this.isOpen = false;
-        this.isFlagged = false;
-        this.value = 0;
+    constructor(isOpen=false, isFlagged=false, value=0) {
+        this.isOpen = isOpen;
+        this.isFlagged = isFlagged;
+        this.value = value;
     }
 
     get isBomb() {
@@ -13,10 +15,27 @@ class MSCell {
 }
 
 /**
-  @brief: Generates a random integer in the range [low, high).
+  @brief    Generates a random integer in the range [low, high).
 **/
 function randomInt(low, high) {
     return Math.floor(low + (high - low) * Math.random());
+}
+
+/**
+  @brief    Inserts an element into a sorted array in-place, maintaining the sorted property. No insertion occurs if the element is a duplicate.
+  @param    array: Array[<T>]: A sorted array.
+  @param    e: <T>: The element to be inserted. Note that the element must be comparable.
+**/
+function sortedSetInsertion(array, e) {
+    for (var i = 0; i < array.length; ++i) {
+        if (array[i] === e)
+            return;
+
+        if (array[i] > e) {
+            break;
+        }
+    }
+    array.splice(i, 0, e);
 }
 
 
@@ -47,6 +66,14 @@ class MSModel {
         }
     }
 
+    index(x, y) {
+        return y * this.width + x;
+    }
+
+    unindex(idx) {
+        return Qt.point(idx % this.width, Math.floor(idx / this.width));
+    }
+
     numBombs() {
         return Math.floor(this.mineDensity * this.width * this.height);
     }
@@ -75,27 +102,13 @@ class MSModel {
     }
 
     /**
-      @brief: Opens or chords the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
-      @param x: Number
-      @param y: Number
+      @brief    Opens or chords the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
+      @param    x: Number
+      @param    y: Number
     **/
-    open(x, y) {
+    openRecursive(x, y) {
         var cell = this.model[y][x];
         var filteredTargets = this.filterTargetsOnPoint(x, y);
-
-        if (this.firstClick) {
-            this.firstClick = false;
-
-            while (filteredTargets.some(t => this.model[y + t.y][x + t.x].isBomb) || cell.value !== 0) {
-                filteredTargets.map(t => this.model[y + t.y][x + t.x].isBomb ? this.relocate(x + t.x, y + t.y) : 0);
-
-                if (cell.value !== 0) {
-                    this.relocate(x, y);
-                }
-            }
-
-
-        }
 
         if (cell.isOpen) {
             //  check adjacent flags and open adjacent closed
@@ -103,7 +116,8 @@ class MSModel {
             let valueClosedFlagged = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isFlagged && !this.model[y+t.y][x+t.x].isOpen) * t.weight, 0);
             if (valueClosedFlagged + valueOpenBombs === cell.value) {
                 //  chord
-                filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.open(x + t.x, y + t.y));
+                filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.openRecursive(x + t.x, y + t.y));
+
                 //  unflag incorrect flags
 //                filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged && !this.model[y + t.y][x + t.x].isBomb).map(t => this.flag(x + t.x, y + t.y));
             }
@@ -115,14 +129,23 @@ class MSModel {
 
         //  cascade
         if (cell.value === 0) {
-            filteredTargets.map(t => this.open(x + t.x, y + t.y));
+            filteredTargets.map(t => this.openRecursive(x + t.x, y + t.y));
         }
     }
 
+    open(x, y) {
+        if (this.firstClick) {
+            this.firstClick = false;
+            this.handleFirstClick(x, y);
+        }
+
+       this.openRecursive(x, y);
+    }
+
     /**
-      @brief: Flags or chord-flags the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
-      @param x: Number
-      @param y: Number
+      @brief    Flags or chord-flags the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
+      @param    x: Number
+      @param    y: Number
     **/
     flag(x, y) {
         if (this.model[y][x].isOpen) {
@@ -153,17 +176,17 @@ class MSModel {
 
 
     /**
-      @brief: resets grid and generates bombs, whitelisted indices will never have bombs
-      @param whitelist: Array[Number] := indices of the grid (row-major) to exclude when generating bombs
+      @brief    Resets grid and generates bombs, whitelisted indices will never have bombs
+      @param    whitelist: Array[Number]: Indices of the grid (row-major) to exclude when generating bombs
     **/
-    generateBombs(whitelist = []) {
+    generateBombs(whitelist=[]) {
         //  reset squares
         this.reset();
 
         var array = new Array(this.width * this.height);
         for (let i = 0; i < this.width * this.height; ++i) {
             if (!whitelist.includes(i))
-                array[i] = Qt.point(i % this.width, Math.floor(i / this.width));
+                array[i] = this.unindex(i);
         }
 
         //  set bombs
@@ -172,63 +195,85 @@ class MSModel {
             this.model[array[randomIndex].y][array[randomIndex].x].value = -1;
             array.splice(randomIndex, 1);
         }
+    }
 
+    fillLeftovers() {
+        for (let i = 0; i < this.height; ++i)
+            for (let j = 0; j < this.width; ++j)
+                if (!this.model[i][j].isBomb)
+                    this.model[i][j].value = this.calculateValue(j, i);
+    }
 
-        //  add whitelist to array
-        for (let i = 0; i < whitelist.length; ++i) {
-            array.push(Qt.point(whitelist[i] % this.width, Math.floor(whitelist[i] / this.width)));
+    /**
+      @brief    Handles a first click at the coordinates (x, y).
+      @param    x: Number
+      @param    y: Number
+    **/
+    handleFirstClick(x, y) {
+        var cell = this.model[y][x];
+        const filteredTargets = this.filterTargetsOnPoint(x, y);
+
+        //  get surrounding indices to whitelist
+        const whitelist = [this.index(x, y), ...filteredTargets.map(t => this.index(x + t.x, y + t.y))].sort((a, b) => a - b);
+
+        //  get the number of bombs to relocate
+        const nBombs = cell.isBomb + filteredTargets.filter(t => this.model[y + t.y][x + t.x].isBomb).length;
+
+        cell.value = 0;
+        filteredTargets.map(t => {
+                                this.model[y + t.y][x + t.x].value = 0;
+                            });
+
+        this.relocateBombsOnFirstClick(whitelist, nBombs);
+        this.fillLeftovers();
+    }
+
+    /**
+      @brief    Relocates bombs elsewhere on the grid.
+      @param    whitelist: Array[Number]: Indices of the grid to exclude when relocating bombs
+      @param    n: Number: The number of bombs to relocate
+    **/
+    relocateBombsOnFirstClick(whitelist=[], n) {
+        for (let i = 0; i < this.height; ++i) {
+            for (let j = 0; j < this.width; ++j) {
+                const idx = this.index(j, i);
+                if (this.model[i][j].isBomb)
+                    sortedSetInsertion(whitelist, idx);
+            }
         }
-        //  set value for leftovers
-        for (let i = 0; i < array.length; ++i) {
-            let count = this.calculateValue(array[i].x, array[i].y);
-            this.model[array[i].y][array[i].x].value = count;
+
+        for (let i = 0; i < n; ++i) {
+            const pt = this.randomPoint(whitelist);
+            this.model[pt.y][pt.x].value = -1;  //  set a bomb
+            console.log("relocated bomb to (%1, %2)".arg(pt.x).arg(pt.y));
+
+            sortedSetInsertion(whitelist, this.index(pt.x, pt.y));  //  add the point to the whitelist
+
+            //  recalculate values of adjacent cells
+            this.filterTargetsOnPoint(pt.x, pt.y).map(t => {
+                                                          if (!this.model[pt.y + t.y][pt.x + t.x].isBomb)
+                                                            this.model[pt.y + t.y][pt.x + t.x].value = this.calculateValue(pt.x + t.x, pt.y + t.y);
+                                                      });
         }
     }
 
     /**
-      @brief: Relocates the cell at (x, y) to a non-bomb point elsewhere on the board.
-      @param x: Number
-      @param y: Number
+      @brief    Selects a random, non-whitelisted relocation point on the grid.
+      @param    whitelist: Array[Number]: Indices of the grid to exclude. The list is assume to be sorted
+      @return   Point: A valid relocation point
     **/
-    relocate(x, y) {
-        var point = this.selectRelocation(x, y);
-        this.model[point.y][point.x].value = this.model[y][x].value;
-
-        if (this.model[y][x].isBomb) {
-            //  decrement adjacent cells of old bomb
-            this.filterTargetsOnPoint(x, y).map(t => (!this.model[y+t.y][x+t.x].isBomb && !(x+t.x === point.x && y+t.y === point.y)) ? this.model[y+t.y][x+t.x].value -= t.weight : 0);
+    randomPoint(whitelist=[]) {
+        let randomIdx = randomInt(0, this.width * this.height - whitelist.length);
+        for (let idx of whitelist) {
+            if (idx <= randomIdx)
+                randomIdx++;
         }
-
-        //  recalculates value of cell
-        this.model[y][x].value = this.calculateValue(x, y);
-
-        if (this.model[point.y][point.x].isBomb) {
-            //  increment adjacent cells of new bomb
-            this.filterTargetsOnPoint(point.x, point.y).map(t => (!this.model[point.y+t.y][point.x+t.x].isBomb && !(point.x+t.x === x && point.y+t.y === y)) ? this.model[point.y+t.y][point.x+t.x].value += t.weight : 0);
-        }
-        console.warn('relocated (%1, %2) to (%3, %4)'.arg(x).arg(y).arg(point.x).arg(point.y));
+        return this.unindex(randomIdx);
     }
 
     /**
-      @brief: Selects a valid (non-bomb) relocation point from the coordinates (x, y).
-      @param x: Number
-      @param y: Number
+      @brief    Resets each cell to the default setting and resets first click.
     **/
-    selectRelocation(x, y) {
-        var resx = 0;
-        var resy = 0;
-        do {
-//            resx++;
-//            if (resx >= this.width) {
-//                resx = 0;
-//                resy++;
-//            }
-            resx = randomInt(0, this.width);
-            resy = randomInt(0, this.height);
-        } while (this.model[resy][resx].isBomb || (resx === x && resy === y));
-        return Qt.point(resx, resy);
-    }
-
     reset() {
         console.log("reseting board");
         for (let i = 0; i < this.height; ++i) {
@@ -250,5 +295,29 @@ class MSModel {
             }
             console.log(str);
         }
+    }
+
+    static useDebugModel() {
+        const width = 8;
+        const height = 8;
+        let model = new MSModel(width, height, MSTarget.target["Normal"]);
+        const board = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+        ];
+        model.model = new Array(height);
+        for (let i = 0; i < height; ++i) {
+            model.model[i] = new Array(width);
+            for (let j = 0; j < width; ++j)
+                model.model[i][j] = new MSCell(false, false, board[i][j]);
+        }
+        model.fillLeftovers();
+        return model;
     }
 }

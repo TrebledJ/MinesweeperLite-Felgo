@@ -23,6 +23,8 @@ Scene {
 
     function newGame() {
         minesweeperBoard.generate();
+//        minesweeperBoard.useDebugModel();
+        minesweeperBoard.debug();
         clock.stop();
         clock.timeTaken = 0;
     }
@@ -30,7 +32,6 @@ Scene {
 
     Component.onCompleted: {
         newGame();
-        minesweeperBoard.debug();
     }
 
 

@@ -62,6 +62,10 @@ Item {
             }
     }
 
+    function useDebugModel() {
+        minesweeperModel = MSLogic.MSModel.useDebugModel();
+    }
+
     function debug() {
         minesweeperModel.debug();
     }
