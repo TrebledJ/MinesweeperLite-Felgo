@@ -92,12 +92,12 @@ class MSModel {
         return this.numBombs() - flags - openBombs;
     }
 
-    filterTargetsOnPoint(x, y) {
+    __filterTargetsOnPoint(x, y) {
         return this.targets.filter(t => (0 <= x+t.x && x+t.x < this.width && 0 <= y+t.y && y+t.y < this.height));
     }
 
     calculateValue(x, y) {
-        var filteredTargets = this.filterTargetsOnPoint(x, y);
+        var filteredTargets = this.__filterTargetsOnPoint(x, y);
         return filteredTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isBomb * t.weight, 0);
     }
 
@@ -108,7 +108,7 @@ class MSModel {
     **/
     openRecursive(x, y) {
         var cell = this.model[y][x];
-        var filteredTargets = this.filterTargetsOnPoint(x, y);
+        var filteredTargets = this.__filterTargetsOnPoint(x, y);
 
         if (cell.isOpen) {
             //  check adjacent flags and open adjacent closed
@@ -136,7 +136,7 @@ class MSModel {
     open(x, y) {
         if (this.firstClick) {
             this.firstClick = false;
-            this.handleFirstClick(x, y);
+            this.__handleFirstClick(x, y);
         }
 
        this.openRecursive(x, y);
@@ -149,7 +149,7 @@ class MSModel {
     **/
     flag(x, y) {
         if (this.model[y][x].isOpen) {
-            let filteredTargets = this.filterTargetsOnPoint(x, y);
+            let filteredTargets = this.__filterTargetsOnPoint(x, y);
             let filteredClosedTargets = filteredTargets.filter(t => !this.model[y + t.y][x + t.x].isOpen);
             let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
             let valueClosed = filteredClosedTargets.reduce((acc, t) => acc + t.weight, 0);
@@ -209,9 +209,9 @@ class MSModel {
       @param    x: Number
       @param    y: Number
     **/
-    handleFirstClick(x, y) {
+    __handleFirstClick(x, y) {
         var cell = this.model[y][x];
-        const filteredTargets = this.filterTargetsOnPoint(x, y);
+        const filteredTargets = this.__filterTargetsOnPoint(x, y);
 
         //  get surrounding indices to whitelist
         const whitelist = [this.index(x, y), ...filteredTargets.map(t => this.index(x + t.x, y + t.y))].sort((a, b) => a - b);
@@ -224,7 +224,7 @@ class MSModel {
                                 this.model[y + t.y][x + t.x].value = 0;
                             });
 
-        this.relocateBombsOnFirstClick(whitelist, nBombs);
+        this.__relocateBombsOnFirstClick(whitelist, nBombs);
         this.fillLeftovers();
     }
 
@@ -233,7 +233,7 @@ class MSModel {
       @param    whitelist: Array[Number]: Indices of the grid to exclude when relocating bombs
       @param    n: Number: The number of bombs to relocate
     **/
-    relocateBombsOnFirstClick(whitelist=[], n) {
+    __relocateBombsOnFirstClick(whitelist=[], n) {
         for (let i = 0; i < this.height; ++i) {
             for (let j = 0; j < this.width; ++j) {
                 const idx = this.index(j, i);
@@ -243,14 +243,14 @@ class MSModel {
         }
 
         for (let i = 0; i < n; ++i) {
-            const pt = this.randomPoint(whitelist);
+            const pt = this.__randomPoint(whitelist);
             this.model[pt.y][pt.x].value = -1;  //  set a bomb
             console.log("relocated bomb to (%1, %2)".arg(pt.x).arg(pt.y));
 
             sortedSetInsertion(whitelist, this.index(pt.x, pt.y));  //  add the point to the whitelist
 
             //  recalculate values of adjacent cells
-            this.filterTargetsOnPoint(pt.x, pt.y).map(t => {
+            this.__filterTargetsOnPoint(pt.x, pt.y).map(t => {
                                                           if (!this.model[pt.y + t.y][pt.x + t.x].isBomb)
                                                             this.model[pt.y + t.y][pt.x + t.x].value = this.calculateValue(pt.x + t.x, pt.y + t.y);
                                                       });
@@ -262,7 +262,7 @@ class MSModel {
       @param    whitelist: Array[Number]: Indices of the grid to exclude. The list is assume to be sorted
       @return   Point: A valid relocation point
     **/
-    randomPoint(whitelist=[]) {
+    __randomPoint(whitelist=[]) {
         let randomIdx = randomInt(0, this.width * this.height - whitelist.length);
         for (let idx of whitelist) {
             if (idx <= randomIdx)
