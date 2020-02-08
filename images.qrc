@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/placeholder.png</file>
+    </qresource>
+</RCC>
