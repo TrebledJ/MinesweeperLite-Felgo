@@ -96,10 +96,8 @@ Item {
                 }
 
                 function flag() {
-                    if (flagsLeft > 0) {
-                        minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
-                        updateGrid();
-                    }
+                    minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
+                    updateGrid();
                 }
 
                 onClicked: {
