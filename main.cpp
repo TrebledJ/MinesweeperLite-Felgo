@@ -2,12 +2,22 @@
 #include <FelgoApplication>
 
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+
+//#define PUBLISH	//	 uncomment to publish
+
+#ifndef PUBLISH
+# include <FelgoLiveClient>
+#endif
+
+//#include <QDebug>
 
 
 int main(int argc, char *argv[])
 {
 
     QApplication app(argc, argv);
+
 
     FelgoApplication felgo;
 
@@ -16,21 +26,26 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     felgo.initialize(&engine);
 
-    // Set an optional license key from project file
-    // This does not work if using Felgo Live, only for Felgo Cloud Builds and local builds
-    felgo.setLicenseKey(PRODUCT_LICENSE_KEY);
-
-    // use this during development
-    // for PUBLISHING, use the entry point below
-    felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
+#ifndef	PUBLISH
+    // ** use this during development **
+    felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));	//	comment for publishing
+    // ** for PUBLISHING, use the entry point below **
+#endif
 
     // use this instead of the above call to avoid deployment of the qml files and compile them into the binary with qt's resource system qrc
     // this is the preferred deployment option for publishing games to the app stores, because then your qml files and js files are protected
     // to avoid deployment of your qml files and images, also comment the DEPLOYMENTFOLDERS command in the .pro file
     // also see the .pro file for more details
-    // felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
 
-    engine.load(QUrl(felgo.mainQmlFileName()));
+#ifdef PUBLISH
+    felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml")); // uncomment for publishing
+#endif
+
+#ifdef PUBLISH
+    engine.load(QUrl(felgo.mainQmlFileName()));	// uncomment for publishing
+#else
+    FelgoLiveClient liveClient(&engine);	//	comment to disable live client and/or for publishing
+#endif
 
     return app.exec();
 }
