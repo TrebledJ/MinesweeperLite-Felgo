@@ -50,6 +50,9 @@ Scene {
                 anchors.right: parent.right
                 height: 60
 
+                flagsLeft: minesweeperBoard.flagsLeft
+                timeTaken: clock.timeTaken
+
                 onNewGameClicked: newGame()
                 onPauseClicked: ;
                 onSettingsClicked: scene.gotoSettings()
