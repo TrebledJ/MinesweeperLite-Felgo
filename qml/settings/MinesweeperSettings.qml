@@ -10,7 +10,7 @@ Item {
     property int difficultyIndex: 0
     property int modeIndex: 0
 
-    property Storage settings
+    property QtObject settings
 
 
     function difficulty() {

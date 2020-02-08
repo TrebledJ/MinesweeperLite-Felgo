@@ -12,7 +12,7 @@ Text {
 	color: "navy"
 	
 	text: ""
-	font.family: "Trebuchet MS"
+    font.family: "Consolas"
 //	font.family: trebuchetMs.name
 	
 	//	see: https://contingencycoder.wordpress.com/2013/08/05/quick-tip-load-fonts-from-a-local-file-with-qml/

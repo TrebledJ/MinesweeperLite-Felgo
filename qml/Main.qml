@@ -3,7 +3,6 @@ import QtQuick 2.12
 
 import "scenes"
 import "settings"
-import "js/MSEnum.js" as MSEnum
 
 GameWindow {
     id: gameWindow
@@ -28,8 +27,6 @@ GameWindow {
 
     MinesweeperScene {
         id: minesweeperScene
-//        minesweeperBoard.difficulty: MSEnum.Difficulty.index(settingsScene.difficultyIndex)
-//        minesweeperBoard.mode: MSEnum.Mode.index(settingsScene.modeIndex)
         onGotoSettings: {
             gameWindow.state = "settingsScene";
         }
@@ -55,18 +52,4 @@ GameWindow {
             PropertyChanges { target: settingsScene; opacity: 1 }
         }
     ]
-
-//    Connections {
-//        target: MSSettings
-
-//        onDifficultyIndexChanged: {
-//            gameWindow.settings.setValue("difficultyIndex", difficultyIndex);
-//            console.log("di changed");
-//        }
-
-//        onModeIndexChanged: {
-//            gameWindow.settings.setValue("modeIndex", modeIndex);
-//            console.log("mi changed");
-//        }
-//    }
 }

@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.13
+import QtQuick.Layouts 1.3
 import Felgo 3.0
 
 import "../../common"
@@ -9,31 +10,61 @@ Rectangle {
 
     property int timeTaken
     property int flagsLeft
-    signal newGameClicked()
 
-//    anchors.left: parent.left
-//    anchors.right: parent.right
-//    height: 60
-//    z: 2
+    signal newGameClicked()
+    signal settingsClicked()
+    signal pauseClicked()
 
     color: "goldenrod"
 
-    Row {
-//        anchors.fill: parent
-//        anchors.margins: 10
-        anchors.horizontalCenter:parent.horizontalCenter
-        spacing: 10
+    BubbleButton {
+        id: pauseButton
+        anchors { top: parent.top; left: parent.left; margins: 5 }
+        width: 15
+        height: 15
+        background.color: "transparent"
+        image.source: "qrc:/assets/placeholder"
+        image.anchors.margins: 0
 
-        Rectangle {
-            width: 80
-            height: 40
-            color: "yellow"
-            TextBase {
+        onClicked: topBar.pauseClicked()
+    }
+
+    BubbleButton {
+        id: settingsButton
+        anchors { top: parent.top; right: parent.right; margins: 5 }
+        width: 15
+        height: 15
+        background.color: "transparent"
+        image.source: "qrc:/assets/placeholder"
+        image.anchors.margins: 0
+
+        onClicked: topBar.settingsClicked()
+    }
+
+
+    RowLayout {
+        anchors.fill: parent
+        spacing: 15
+
+        Item { Layout.fillWidth: true }
+
+        Row {
+            Image {
+                //  flags left img
+                width: 40
+                height: 40
+                source: "qrc:/assets/placeholder"
+            }
+            Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                text: timeTaken
-                font.pointSize: 11
+                width: 40
+                height: 30
+                color: "yellow"
+                TextBase {
+                    anchors.centerIn: parent
+                    text: flagsLeft
+                    font.pointSize: 11
+                }
             }
         }
 
@@ -41,51 +72,32 @@ Rectangle {
             width: 60
             height: 40
             text: "New"
-            font.pointSize: 12
-            onClicked: newGameClicked()
+            font.pointSize: 14
+            onClicked: topBar.newGameClicked()
         }
 
-        Rectangle {
-            width: 80
-            height: 40
-            color: "yellow"
-            TextBase {
+        Row {
+            Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                text: flagsLeft
-                font.pointSize: 11
+                width: 40
+                height: 30
+                color: "yellow"
+
+                TextBase {
+                    anchors.centerIn: parent
+                    text: timeTaken
+                    font.pointSize: 11
+                }
+            }
+            Image {
+                //  time taken img
+                width: 40
+                height: 40
+                source: "qrc:/assets/placeholder"
             }
         }
 
-//        Column {
-//            width: 140
-//            spacing: 4
-
-//            BubbleButton {
-//                //  modifies the difficulty
-//                width: parent.width
-//                height: 18
-//                text: "Difficulty: " + MSSettings.difficulty()
-//                font.pointSize: 10
-//                onClicked: {
-//                    MSSettings.incrementDifficultyIndex();
-//                }
-//            }
-
-//            BubbleButton {
-//                //  modifies the mode
-//                width: parent.width
-//                height: 18
-//                text: "Mode: " + MSSettings.mode()
-//                font.pointSize: 10
-//                onClicked: {
-//                    MSSettings.incrementModeIndex();
-//                }
-//            }
-//        }
-
-
-
+        Item { Layout.fillWidth: true }
     }
+
 }   //  Rectangle: topBar

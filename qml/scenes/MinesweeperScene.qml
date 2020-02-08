@@ -4,7 +4,6 @@ import QtQuick 2.0
 import "../common"
 import "components"
 import "../settings"
-import "../js/MSEnum.js" as MSEnum
 
 Scene {
     id: scene
@@ -45,73 +44,16 @@ Scene {
         Column {
             anchors.fill: parent
 
-//            /*
-            Rectangle {
+            MinesweeperTopBar {
                 id: topBar
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: 60
-                z: 2
 
-                color: "goldenrod"
-//                color: "transparent"
-
-//                MouseArea {
-//                    anchors.fill: parent
-//                    onClicked: scene.gotoSettings()
-//                }
-
-                Row {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 10
-
-                    Column {
-                        width: 140
-                        spacing: 4
-
-                        BubbleButton {
-                            //  modifies the difficulty
-                            width: parent.width
-                            height: 18
-                            text: "Difficulty: " + MSSettings.difficulty()
-                            font.pointSize: 10
-                            onClicked: {
-                                MSSettings.incrementDifficultyIndex();
-                            }
-                        }
-
-                        BubbleButton {
-                            //  modifies the mode
-                            width: parent.width
-                            height: 18
-                            text: "Mode: " + MSSettings.mode()
-                            font.pointSize: 10
-                            onClicked: {
-                                MSSettings.incrementModeIndex();
-                            }
-                        }
-                    }
-
-                    BubbleButton {
-                        width: 140
-                        height: 40
-                        text: "New Game"
-                        font.pointSize: 12
-                        onClicked: {
-                            newGame();
-                        }
-                    }
-                }
-            }   //  Rectangle: topBar
-//            */
-
-//            MinesweeperTopBar {
-//                id: topBar
-//                anchors.left: parent.left
-//                anchors.right: parent.right
-//                height: 60
-//            }
+                onNewGameClicked: newGame()
+                onPauseClicked: ;
+                onSettingsClicked: scene.gotoSettings()
+            }
 
             Rectangle {
                 id: stage
@@ -203,10 +145,8 @@ Scene {
 
                             defaultWidth: stage.width * 7/8
                             defaultHeight: stage.height * 7/8
-//                            difficulty: MSEnum.Difficulty.index(difficultyIndex)
-//                            mode: MSEnum.Mode.index(modeIndex)
-                            difficulty: MSEnum.Difficulty.index(MSSettings.difficultyIndex)
-                            mode: MSEnum.Mode.index(MSSettings.modeIndex)
+                            difficulty: MSSettings.difficulty()
+                            mode: MSSettings.mode()
                             onClicked: clock.start();
                         }
 
@@ -291,42 +231,9 @@ Scene {
                     onClicked: {
                         if (mouse.button === Qt.RightButton) {
                             minesweeperBoard.minesweeperModel.debug()
-//                        } else {
-//                            minesweeperBoard.generate()
                         }
                     }
                 }
-
-                Row {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 10
-
-                    Rectangle {
-                        width: 140
-                        height: 40
-                        color: "yellow"
-                        TextBase {
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 10
-                            text: "Time: " + clock.timeTaken
-                        }
-                    }
-
-                    Rectangle {
-                        width: 140
-                        height: 40
-                        color: "yellow"
-                        TextBase {
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 10
-                            text: "Flags Left: " + minesweeperBoard.flagsLeft
-                        }
-                    }
-                }
-
             }   //  Rectangle: bottomBar
         }   //  Column
     }   //  Rectangle: background

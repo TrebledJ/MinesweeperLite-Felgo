@@ -5,15 +5,10 @@ import Felgo 3.0
 import QtQuick 2.12
 
 import "../common"
-import "../js/MSEnum.js" as MSEnum
+import "../settings"
 
 Scene {
     id: scene
-
-    property int difficultyIndex
-    property int modeIndex
-//    property alias difficultyIndex: MSSettings.difficultyIndex
-//    property alias modeIndex: MSSettings.modeIndex
 
     width: 320
     height: 480
@@ -48,26 +43,35 @@ Scene {
                 columns: 2
                 spacing: 20
 
+                TextBase {
+                    text: "Difficulty"
+                    font.pointSize: 10
+                }
+
                 BubbleButton {
                     //  modifies the difficulty
                     width: 130
                     height: 40
-                    text: "Difficulty: " + MSEnum.Difficulty.index(difficultyIndex)
-                    font.pointSize: 12
+                    text: MSSettings.difficulty()
+                    font.pointSize: 10
                     onClicked: {
-                        difficultyIndex = (difficultyIndex + 1) % MSEnum.Difficulty.count;
-//                        gameWindow.settings.setValue("difficultyIndex", (difficultyIndex + 1) % MSEnum.Difficulty.count);
+                        MSSettings.incrementDifficultyIndex();
                     }
+                }
+
+                TextBase {
+                    text: "Mode"
+                    font.pointSize: 10
                 }
 
                 BubbleButton {
                     //  modifies the mode
                     width: 130
                     height: 40
-                    text: "Mode: " + MSEnum.Mode.index(modeIndex)
-                    font.pointSize: 12
+                    text: MSSettings.mode()
+                    font.pointSize: 10
                     onClicked: {
-                        modeIndex = (modeIndex + 1) % MSEnum.Mode.count;
+                        MSSettings.incrementModeIndex();
                     }
                 }
             }
