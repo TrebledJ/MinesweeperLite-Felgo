@@ -96,27 +96,55 @@ class MSModel {
         return this.targets.filter(t => (0 <= x+t.x && x+t.x < this.width && 0 <= y+t.y && y+t.y < this.height));
     }
 
-    calculateValue(x, y) {
+    __calculateValue(x, y) {
         var filteredTargets = this.__filterTargetsOnPoint(x, y);
         return filteredTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isBomb * t.weight, 0);
     }
 
     /**
-      @brief    Opens or chords the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
+      @brief    Opens the cell at the coordinates (x, y), where (0, 0) is the top-left corner of the board.
       @param    x: Number
       @param    y: Number
     **/
-    openRecursive(x, y) {
+    __openRecursive(x, y) {
         var cell = this.model[y][x];
         var filteredTargets = this.__filterTargetsOnPoint(x, y);
 
+        if (cell.isOpen)
+            return;
+
+        if (!cell.isFlagged)
+            cell.isOpen = true;
+
+        //  cascade
+        if (cell.value === 0) {
+            filteredTargets.map(t => this.__openRecursive(x + t.x, y + t.y));
+        }
+    }
+
+    /**
+      @brief    Manages the opening of cells. Opens closed cells. Chords on opened non-zero/non-bomb cells
+      @param    x: Number
+      @param    y: Number
+    **/
+    open(x, y) {
+        if (this.firstClick) {
+            this.firstClick = false;
+            this.__handleFirstClick(x, y);
+        }
+
+        var cell = this.model[y][x];
+        var filteredTargets = this.__filterTargetsOnPoint(x, y);
         if (cell.isOpen) {
+            if (cell.value === 0)
+                return;
+
             //  check adjacent flags and open adjacent closed
             let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
             let valueClosedFlagged = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isFlagged && !this.model[y+t.y][x+t.x].isOpen) * t.weight, 0);
             if (valueClosedFlagged + valueOpenBombs === cell.value) {
                 //  chord
-                filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.openRecursive(x + t.x, y + t.y));
+                filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.__openRecursive(x + t.x, y + t.y));
 
                 //  unflag incorrect flags
 //                filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged && !this.model[y + t.y][x + t.x].isBomb).map(t => this.flag(x + t.x, y + t.y));
@@ -124,22 +152,7 @@ class MSModel {
             return;
         }
 
-        //  set cell to open
-        cell.isOpen = true;
-
-        //  cascade
-        if (cell.value === 0) {
-            filteredTargets.map(t => this.openRecursive(x + t.x, y + t.y));
-        }
-    }
-
-    open(x, y) {
-        if (this.firstClick) {
-            this.firstClick = false;
-            this.__handleFirstClick(x, y);
-        }
-
-       this.openRecursive(x, y);
+       this.__openRecursive(x, y);
     }
 
     /**
@@ -201,7 +214,7 @@ class MSModel {
         for (let i = 0; i < this.height; ++i)
             for (let j = 0; j < this.width; ++j)
                 if (!this.model[i][j].isBomb)
-                    this.model[i][j].value = this.calculateValue(j, i);
+                    this.model[i][j].value = this.__calculateValue(j, i);
     }
 
     /**
@@ -252,7 +265,7 @@ class MSModel {
             //  recalculate values of adjacent cells
             this.__filterTargetsOnPoint(pt.x, pt.y).map(t => {
                                                           if (!this.model[pt.y + t.y][pt.x + t.x].isBomb)
-                                                            this.model[pt.y + t.y][pt.x + t.x].value = this.calculateValue(pt.x + t.x, pt.y + t.y);
+                                                            this.model[pt.y + t.y][pt.x + t.x].value = this.__calculateValue(pt.x + t.x, pt.y + t.y);
                                                       });
         }
     }
