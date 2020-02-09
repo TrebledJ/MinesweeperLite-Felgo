@@ -97,7 +97,7 @@ class MSModel {
     }
 
     __calculateValue(x, y) {
-        var filteredTargets = this.__filterTargetsOnPoint(x, y);
+        const filteredTargets = this.__filterTargetsOnPoint(x, y);
         return filteredTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isBomb * t.weight, 0);
     }
 
@@ -107,8 +107,8 @@ class MSModel {
       @param    y: Number
     **/
     __openRecursive(x, y) {
-        var cell = this.model[y][x];
-        var filteredTargets = this.__filterTargetsOnPoint(x, y);
+        let cell = this.model[y][x];
+        const filteredTargets = this.__filterTargetsOnPoint(x, y);
 
         if (cell.isOpen)
             return;
@@ -133,15 +133,15 @@ class MSModel {
             this.__handleFirstClick(x, y);
         }
 
-        var cell = this.model[y][x];
-        var filteredTargets = this.__filterTargetsOnPoint(x, y);
+        const cell = this.model[y][x];
+        const filteredTargets = this.__filterTargetsOnPoint(x, y);
         if (cell.isOpen) {
             if (cell.value === 0)
                 return;
 
             //  check adjacent flags and open adjacent closed
-            let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
-            let valueClosedFlagged = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isFlagged && !this.model[y+t.y][x+t.x].isOpen) * t.weight, 0);
+            const valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
+            const valueClosedFlagged = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isFlagged && !this.model[y+t.y][x+t.x].isOpen) * t.weight, 0);
             if (valueClosedFlagged + valueOpenBombs === cell.value) {
                 //  chord
                 filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.__openRecursive(x + t.x, y + t.y));
@@ -159,14 +159,14 @@ class MSModel {
     **/
     flag(x, y) {
         if (this.model[y][x].isOpen) {
-            let filteredTargets = this.__filterTargetsOnPoint(x, y);
-            let filteredClosedTargets = filteredTargets.filter(t => !this.model[y + t.y][x + t.x].isOpen);
-            let valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
-            let valueClosed = filteredClosedTargets.reduce((acc, t) => acc + t.weight, 0);
+            const filteredTargets = this.__filterTargetsOnPoint(x, y);
+            const filteredClosedTargets = filteredTargets.filter(t => !this.model[y + t.y][x + t.x].isOpen);
+            const valueOpenBombs = filteredTargets.reduce((acc, t) => acc + (this.model[y + t.y][x + t.x].isOpen && this.model[y + t.y][x + t.x].isBomb) * t.weight, 0);
+            const valueClosed = filteredClosedTargets.reduce((acc, t) => acc + t.weight, 0);
 
             //  execute flagging if value of closed cells and value of open bombs add up to clicked cell's value
             if (valueClosed + valueOpenBombs === this.model[y][x].value) {
-                let valueClosedFlagged = filteredClosedTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
+                const valueClosedFlagged = filteredClosedTargets.reduce((acc, t) => acc + this.model[y + t.y][x + t.x].isFlagged * t.weight, 0);
                 //  none are flagged or all are flagged
                 if (valueClosedFlagged === 0 || valueOpenBombs + valueClosedFlagged === this.model[y][x].value) {
                     //  flag all or unflag all
@@ -193,7 +193,7 @@ class MSModel {
         //  reset squares
         this.reset();
 
-        var array = new Array(this.width * this.height);
+        let array = new Array(this.width * this.height);
         for (let i = 0; i < this.width * this.height; ++i) {
             if (!whitelist.includes(i))
                 array[i] = this.unindex(i);
@@ -201,7 +201,7 @@ class MSModel {
 
         //  set bombs
         for (let i = 0; i < this.numBombs(); ++i) {
-            let randomIndex = randomInt(0, array.length);
+            const randomIndex = randomInt(0, array.length);
             this.model[array[randomIndex].y][array[randomIndex].x].value = -1;
             array.splice(randomIndex, 1);
         }
@@ -220,7 +220,7 @@ class MSModel {
       @param    y: Number
     **/
     __handleFirstClick(x, y) {
-        var cell = this.model[y][x];
+        let cell = this.model[y][x];
         const filteredTargets = this.__filterTargetsOnPoint(x, y);
 
         //  get surrounding indices to whitelist
@@ -274,7 +274,7 @@ class MSModel {
     **/
     __randomPoint(whitelist=[]) {
         let randomIdx = randomInt(0, this.width * this.height - whitelist.length);
-        for (let idx of whitelist) {
+        for (const idx of whitelist) {
             if (idx <= randomIdx)
                 randomIdx++;
         }
