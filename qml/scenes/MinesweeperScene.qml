@@ -25,7 +25,7 @@ Scene {
     function newGame() {
         minesweeperBoard.generate();
 //        minesweeperBoard.useDebugModel();
-        minesweeperBoard.debug();
+//        minesweeperBoard.debug();
 
         started = false;
         timer.stop();
