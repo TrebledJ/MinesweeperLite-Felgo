@@ -7,19 +7,15 @@ Item {
     id: item
 
     Rectangle {
+        id: background
         anchors.fill: parent
         color: "darkgrey"
-        opacity: 0.6
+        opacity: 0.98
     }
 
-    BubbleButton {
-        x: parent.width / 2
-        y: 10
-        width: 140
-        height: 40
-
-        text: "Restart"
+    TextBase {
+        anchors.centerIn: background
+        text: "Game Paused"
+        font.pointSize: 24
     }
-
-
 }

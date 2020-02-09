@@ -8,6 +8,8 @@ import "../settings"
 Scene {
     id: scene
 
+    property bool started: false
+    property bool isPaused: false
     property alias minesweeperBoard: minesweeperBoard
 
     signal gotoSettings()
@@ -24,8 +26,26 @@ Scene {
         minesweeperBoard.generate();
 //        minesweeperBoard.useDebugModel();
         minesweeperBoard.debug();
-        clock.stop();
-        clock.timeTaken = 0;
+
+        started = false;
+        timer.stop();
+        timer.reset();
+    }
+
+    function start() {
+        started = true;
+        timer.start();
+    }
+
+    function onPause() {
+        isPaused = !scene.isPaused;
+
+        if (isPaused) {
+            timer.stop();
+        } else {
+            if (started)
+                timer.start();
+        }
     }
 
 
@@ -51,10 +71,10 @@ Scene {
                 height: 60
 
                 flagsLeft: minesweeperBoard.flagsLeft
-                timeTaken: clock.timeTaken
+                timeTaken: timer.time
 
                 onNewGameClicked: newGame()
-                onPauseClicked: ;
+                onPauseClicked: onPause()
                 onSettingsClicked: scene.gotoSettings()
             }
 
@@ -150,7 +170,7 @@ Scene {
                             defaultHeight: stage.height * 7/8
                             difficulty: MSSettings.difficulty()
                             mode: MSSettings.mode()
-                            onClicked: clock.start();
+                            onClicked: scene.start()
                         }
 
                         Item {
@@ -212,10 +232,17 @@ Scene {
                     }
                 }   //  MouseArea
 
-//                PauseOverlay {
-//                    id: pauseOverlay
-//                    anchors.fill: parent
-//                }
+                PauseOverlay {
+                    id: pauseOverlay
+                    anchors.fill: parent
+                    enabled: scene.isPaused
+                    opacity: scene.isPaused
+//                    visible: scene.isPaused
+                    Behavior on opacity {
+                        NumberAnimation {}
+                    }
+
+                }
 
             }   //  Rectangle: stage
 
@@ -242,11 +269,14 @@ Scene {
     }   //  Rectangle: background
 
     Timer {
-        id: clock
-        property int timeTaken: 0
+        id: timer
+
+        property int time: 0
+        function reset() { time = 0; }
+
         interval: 1000
         repeat: true
-        onTriggered: timeTaken++
+        onTriggered: time++
     }
 
 }   //  Scene: scene
