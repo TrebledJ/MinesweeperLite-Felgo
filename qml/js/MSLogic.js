@@ -145,9 +145,6 @@ class MSModel {
             if (valueClosedFlagged + valueOpenBombs === cell.value) {
                 //  chord
                 filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.__openRecursive(x + t.x, y + t.y));
-
-                //  unflag incorrect flags
-//                filteredTargets.filter(t => this.model[y + t.y][x + t.x].isFlagged && !this.model[y + t.y][x + t.x].isBomb).map(t => this.flag(x + t.x, y + t.y));
             }
             return;
         }
