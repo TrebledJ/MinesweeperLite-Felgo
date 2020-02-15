@@ -8,11 +8,13 @@ import "../settings"
 Scene {
     id: scene
 
+
+    signal gotoSettings()
+
     property bool started: false
     property bool isPaused: false
     property alias minesweeperBoard: minesweeperBoard
 
-    signal gotoSettings()
 
     // the "logical size" - the scene content is auto-scaled to match the GameWindow size
     width: 320
@@ -30,15 +32,23 @@ Scene {
         started = false;
         timer.stop();
         timer.reset();
+
+        winLoseOverlay.reset();
     }
 
     function start() {
-        started = true;
-        timer.start();
+        if (!started) {
+            started = true;
+            timer.start();
+        }
+    }
+
+    function end() {
+        timer.stop();
     }
 
     function onPause() {
-        isPaused = !scene.isPaused;
+        isPaused = !isPaused;
 
         if (isPaused) {
             timer.stop();
@@ -163,14 +173,19 @@ Scene {
                         MinesweeperBoard {
                             id: minesweeperBoard
 
-                            enabled: true
+                            enabled: !pauseOverlay.enabled && !winLoseOverlay.enabled
                             opacity: enabled ? 1 : 0.8
 
                             defaultWidth: stage.width * 7/8
                             defaultHeight: stage.height * 7/8
                             difficulty: MSSettings.difficulty()
                             mode: MSSettings.mode()
+
                             onClicked: scene.start()
+                            onWinLoseConditionMet: {
+                                end();
+                                winLoseOverlay.state = minesweeperModel.state;
+                            }
                         }
 
                         Item {
@@ -237,11 +252,14 @@ Scene {
                     anchors.fill: parent
                     enabled: scene.isPaused
                     opacity: scene.isPaused
-//                    visible: scene.isPaused
-                    Behavior on opacity {
-                        NumberAnimation {}
-                    }
+                }
 
+                WinLoseOverlay {
+                    id: winLoseOverlay
+                    width: parent.width
+                    height: parent.height
+
+                    y: enabled ? 0 : parent.height
                 }
 
             }   //  Rectangle: stage

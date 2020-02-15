@@ -18,4 +18,8 @@ Item {
         text: "Game Paused"
         font.pointSize: 24
     }
+
+    Behavior on opacity {
+        NumberAnimation {}
+    }
 }

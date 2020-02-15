@@ -8,7 +8,9 @@ import "../js/MSEnum.js" as MSEnum
 Item {
     id: minesweeperBoard
 
+
     signal clicked()
+    signal winLoseConditionMet()
 
     property var minesweeperModel: new MSLogic.MSModel(8, 8, MSTarget.target["Normal"], 0.12)
     property alias grid: grid
@@ -19,8 +21,10 @@ Item {
     property real defaultWidth: width
     property real defaultHeight: height
 
+
     width: grid.width
     height: grid.height
+
 
     function generate() {
         updateModel();
@@ -50,16 +54,31 @@ Item {
     }
 
     function updateGrid() {
+        //  update size data
         grid.rows = minesweeperModel.height;
         grid.columns = minesweeperModel.width;
+
+        //  update flagsLeft
         flagsLeft = minesweeperModel.flagsLeft();
 
+        //  update cell data
         for (let i = 0; i < grid.rows; ++i)
             for (let j = 0; j < grid.columns; ++j) {
                 gridRepeater.itemAt(i*grid.columns + j).isOpen = minesweeperModel.model[i][j].isOpen;
                 gridRepeater.itemAt(i*grid.columns + j).isFlagged = minesweeperModel.model[i][j].isFlagged;
                 gridRepeater.itemAt(i*grid.columns + j).value = minesweeperModel.model[i][j].value;
             }
+    }
+
+    function checkWinLose() {
+        switch (minesweeperModel.state) {
+        case MSLogic.State.Win:
+        case MSLogic.State.Lose:
+            winLoseConditionMet();
+            break;
+        default:
+            break;
+        }
     }
 
     function useDebugModel() {
@@ -93,11 +112,13 @@ Item {
                 function open() {
                     minesweeperModel.open(index % grid.columns, Math.floor(index / grid.columns));
                     updateGrid();
+                    checkWinLose();
                 }
 
                 function flag() {
                     minesweeperModel.flag(index % grid.columns, Math.floor(index / grid.columns));
                     updateGrid();
+                    checkWinLose();
                 }
 
                 onClicked: {

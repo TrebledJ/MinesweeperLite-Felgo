@@ -15,6 +15,13 @@ class MSCell {
 }
 
 
+const State = {
+    Win: "win",
+    Lose: "lose",
+    Active: "active",
+};
+
+
 /**
   @brief    Generates a random integer in the range [low, high).
 **/
@@ -53,7 +60,9 @@ class MSModel {
         this.targets = targets;
         this.mineDensity = mineDensity;
 
+        this.countOpened = 0;
         this.firstClick = true;
+        this.state = State.Active;
     }
 
     setDimensions(width, height) {
@@ -113,12 +122,18 @@ class MSModel {
         if (cell.isOpen)
             return;
 
-        if (!cell.isFlagged)
+        if (!cell.isFlagged) {
             cell.isOpen = true;
 
-        //  cascade
-        if (cell.value === 0) {
-            filteredTargets.map(t => this.__openRecursive(x + t.x, y + t.y));
+            if (cell.isBomb)
+                this.state = State.Lose;
+            else
+                this.countOpened++;
+
+            //  cascade
+            if (cell.value === 0) {
+                filteredTargets.map(t => this.__openRecursive(x + t.x, y + t.y));
+            }
         }
     }
 
@@ -146,10 +161,13 @@ class MSModel {
                 //  chord
                 filteredTargets.filter(t => !(this.model[y + t.y][x + t.x].isFlagged || this.model[y + t.y][x + t.x].isOpen)).map(t => this.__openRecursive(x + t.x, y + t.y));
             }
+
+            this.__checkWinCondition();
             return;
         }
 
-       this.__openRecursive(x, y);
+        this.__openRecursive(x, y);
+        this.__checkWinCondition();
     }
 
     /**
@@ -282,6 +300,26 @@ class MSModel {
     }
 
     /**
+      @brief    Checks for the win state.
+    **/
+    __checkWinCondition() {
+        if (this.countOpened === this.width * this.height - this.numBombs()) {
+            this.state = State.Win;
+        }
+
+        switch (this.state) {
+        case State.Win:
+            console.warn("You win!");
+            break;
+        case State.Lose:
+            console.warn("You lose!");
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
       @brief    Resets each cell to the default setting and resets first click.
     **/
     reset() {
@@ -293,7 +331,10 @@ class MSModel {
                 this.model[i][j].value = 0;
             }
         }
+
+        this.countOpened = 0;
         this.firstClick = true;
+        this.state = State.Active;
     }
 
     debug() {
