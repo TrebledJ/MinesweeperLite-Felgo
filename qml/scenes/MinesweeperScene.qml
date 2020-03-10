@@ -8,11 +8,9 @@ import "../settings"
 Scene {
     id: scene
 
-
-    signal gotoSettings()
+    signal settingsClicked()
 
     property bool started: false
-    property bool isPaused: false
     property alias minesweeperBoard: minesweeperBoard
 
 
@@ -30,32 +28,25 @@ Scene {
 //        minesweeperBoard.debug();
 
         started = false;
-        timer.stop();
         timer.reset();
 
         winLoseOverlay.reset();
+        scene.state = "playing";
     }
 
     function start() {
         if (!started) {
             started = true;
-            timer.start();
         }
     }
 
     function end() {
-        timer.stop();
+        started = false;
+        scene.state = "winLose";
     }
 
     function onPause() {
-        isPaused = !isPaused;
-
-        if (isPaused) {
-            timer.stop();
-        } else {
-            if (started)
-                timer.start();
-        }
+        state = (state !== "paused" ? "paused" : "playing");
     }
 
 
@@ -84,14 +75,16 @@ Scene {
                 timeTaken: timer.time
 
                 onNewGameClicked: newGame()
-                onPauseClicked: onPause()
-                onSettingsClicked: scene.gotoSettings()
+                onPauseClicked: {
+                    onPause();
+                }
+                onSettingsClicked: scene.settingsClicked()
             }
 
             Rectangle {
                 id: stage
                 width: parent.width
-                height: background.height - topBar.height - bottomBar.height
+                height: background.height - topBar.height
                 color: "transparent"
 
                 Item {
@@ -173,7 +166,7 @@ Scene {
                         MinesweeperBoard {
                             id: minesweeperBoard
 
-                            enabled: !pauseOverlay.enabled && !winLoseOverlay.enabled
+                            enabled: true
                             opacity: enabled ? 1 : 0.8
 
                             defaultWidth: stage.width * 7/8
@@ -250,51 +243,79 @@ Scene {
                 PauseOverlay {
                     id: pauseOverlay
                     anchors.fill: parent
-                    enabled: scene.isPaused
-                    opacity: scene.isPaused
+                    enabled: false
+                    opacity: enabled
                 }
 
-                WinLoseOverlay {
-                    id: winLoseOverlay
-                    width: parent.width
-                    height: parent.height
-
-                    y: enabled ? 0 : parent.height
+                SettingsOverlay {
+                    id: settingsOverlay
+                    anchors.fill: parent
+                    enabled: false
+                    opacity: enabled
                 }
 
             }   //  Rectangle: stage
 
-            Rectangle {
-                id: bottomBar
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: 60
-                z: 2
-
-                color: "goldenrod"
-
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onClicked: {
-                        if (mouse.button === Qt.RightButton) {
-                            minesweeperBoard.minesweeperModel.debug()
-                        }
-                    }
-                }
-            }   //  Rectangle: bottomBar
         }   //  Column
+
     }   //  Rectangle: background
+
+    WinLoseOverlay {
+        id: winLoseOverlay
+        width: parent.width
+        height: parent.height
+        enabled: false
+        y: enabled ? 0 : parent.height
+        onOverlayClicked: {
+            scene.state = "frozen";
+        }
+    }
 
     Timer {
         id: timer
 
         property int time: 0
+
         function reset() { time = 0; }
 
         interval: 1000
         repeat: true
+        running: scene.state === "playing" && started
         onTriggered: time++
     }
+
+
+    onSettingsClicked: {
+        if (state !== "settings")
+            state = "settings";
+        else
+            state = "playing";
+    }
+
+
+    states: [
+        State {
+            name: "playing"
+        },
+        State {
+            name: "frozen"
+            PropertyChanges { target: minesweeperBoard; enabled: false }
+        },
+        State {
+            name: "paused"
+            PropertyChanges { target: minesweeperBoard; enabled: false }
+            PropertyChanges { target: pauseOverlay; enabled: true }
+        },
+        State {
+            name: "winLose"
+            PropertyChanges { target: background; enabled: false }
+            PropertyChanges { target: winLoseOverlay; enabled: true }
+        },
+        State {
+            name: "settings"
+            PropertyChanges { target: minesweeperBoard; enabled: false }
+            PropertyChanges { target: settingsOverlay; enabled: true }
+        }
+    ]
 
 }   //  Scene: scene

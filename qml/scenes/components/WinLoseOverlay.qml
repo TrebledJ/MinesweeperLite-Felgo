@@ -7,9 +7,10 @@ import "../../js/MSLogic.js" as MSLogic
 Item {
     id: item
 
+    signal overlayClicked()
+
     property var state: MSLogic.State.Active
 
-    enabled: state !== MSLogic.State.Active
 
     function reset() {
         state = MSLogic.State.Active;
@@ -23,7 +24,7 @@ Item {
             case MSLogic.State.Win:
                 return "green";
             case MSLogic.State.Lose:
-                return "goldenrod";
+                return "navy";
             default:
                 return "darkgrey";
             }
@@ -40,12 +41,34 @@ Item {
 
     TextBase {
         anchors.centerIn: background
-        text: item.state === MSLogic.State.Win ? "You win!" : "Try again!"
+        text: {
+            switch (item.state) {
+            case MSLogic.State.Win:
+                return "You win!";
+            case MSLogic.State.Lose:
+                return "Try again!";
+            default:
+                return "";
+            }
+        }
+        color: {
+            switch (item.state) {
+            case MSLogic.State.Lose:
+                return "goldenrod";
+            default:
+                return "navy";
+            }
+        }
 
         font.pointSize: 24
     }
 
     Behavior on y {
         NumberAnimation {}
+    }
+
+    MouseArea {
+        anchors.fill: background
+        onClicked: overlayClicked()
     }
 }

@@ -36,42 +36,87 @@ Scene {
                 }
             }
 
-            Grid {
+            Column {
                 width: parent.width
                 padding: 20
 
-                columns: 2
+//                columns: 2
                 spacing: 20
 
-                TextBase {
-                    text: "Difficulty"
-                    font.pointSize: 10
-                }
+//                Item {
+//                    width: 130
+//                    height: 40
+//                    TextBase {
+//                        anchors.centerIn: parent
+//                        text: "Difficulty"
+//                        font.pointSize: 16
+//                    }
+//                }
 
-                BubbleButton {
-                    //  modifies the difficulty
-                    width: 130
+
+
+
+//                Item {
+//                    width: 130
+//                    height: 40
+//                    TextBase {
+//                        anchors.centerIn: parent
+//                        text: "Mode"
+//                        font.pointSize: 16
+//                    }
+//                }
+
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     height: 40
-                    text: MSSettings.difficulty()
-                    font.pointSize: 10
-                    onClicked: {
-                        MSSettings.incrementDifficultyIndex();
+                    spacing: 20
+
+                    Image {
+                        width: 40
+                        height: 40
+                        source: "qrc:/assets/placeholder"
+                    }
+
+                    BubbleButton {
+                        //  modifies the difficulty
+                        width: 100
+                        height: 40
+                        color: "transparent"
+                        text: MSSettings.difficulty()
+                        horizontalAlignment: Text.AlignLeft
+                        font.pointSize: 12
+                        bubble: false
+                        onClicked: {
+                            MSSettings.incrementDifficultyIndex();
+                        }
                     }
                 }
 
-                TextBase {
-                    text: "Mode"
-                    font.pointSize: 10
-                }
-
-                BubbleButton {
-                    //  modifies the mode
-                    width: 130
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     height: 40
-                    text: MSSettings.mode()
-                    font.pointSize: 10
-                    onClicked: {
-                        MSSettings.incrementModeIndex();
+                    spacing: 20
+
+                    Image {
+                        width: 40
+                        height: 40
+                        source: "qrc:/assets/placeholder"
+                    }
+
+                    BubbleButton {
+                        //  modifies the mode
+                        width: 100
+                        height: 40
+                        color: "transparent"
+                        text: MSSettings.mode()
+                        horizontalAlignment: Text.AlignLeft
+                        font.pointSize: 12
+                        bubble: false
+                        onClicked: {
+                            MSSettings.incrementModeIndex();
+                        }
+
                     }
                 }
             }

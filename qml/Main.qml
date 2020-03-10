@@ -27,16 +27,6 @@ GameWindow {
 
     MinesweeperScene {
         id: minesweeperScene
-        onGotoSettings: {
-            gameWindow.state = "settingsScene";
-        }
-    }
-
-    SettingsScene {
-        id: settingsScene
-        onBackButtonPressed: {
-            gameWindow.state = "minesweeperScene";
-        }
     }
 
     state: "minesweeperScene"
@@ -45,11 +35,6 @@ GameWindow {
             name: "minesweeperScene"
             PropertyChanges { target: gameWindow; activeScene: minesweeperScene }
             PropertyChanges { target: minesweeperScene; opacity: 1 }
-        },
-        State {
-            name: "settingsScene"
-            PropertyChanges { target: gameWindow; activeScene: settingsScene }
-            PropertyChanges { target: settingsScene; opacity: 1 }
         }
     ]
 }
