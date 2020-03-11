@@ -254,6 +254,13 @@ Scene {
                     opacity: enabled
                 }
 
+                FrozenOverlay {
+                    id: frozenOverlay
+                    anchors.fill: parent
+                    enabled: false
+                    onOverlayClicked: topBar.animateNewButton()
+                }
+
             }   //  Rectangle: stage
 
         }   //  Column
@@ -296,10 +303,12 @@ Scene {
     states: [
         State {
             name: "playing"
+            PropertyChanges { target: minesweeperBoard; enabled: true }
         },
         State {
             name: "frozen"
             PropertyChanges { target: minesweeperBoard; enabled: false }
+            PropertyChanges { target: frozenOverlay; enabled: true }
         },
         State {
             name: "paused"

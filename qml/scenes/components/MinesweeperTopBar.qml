@@ -17,6 +17,11 @@ Rectangle {
 
     color: "goldenrod"
 
+    function animateNewButton() {
+        newButton.animateOver();
+    }
+
+
     BubbleButton {
         id: pauseButton
         anchors { top: parent.top; left: parent.left; margins: 5 }
@@ -69,6 +74,7 @@ Rectangle {
         }
 
         BubbleButton {
+            id: newButton
             width: 60
             height: 40
             text: "New"

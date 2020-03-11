@@ -99,6 +99,10 @@ Item {
         }
     }
 
+    function animateOver() {
+        animateScalar(enteredFrom, enteredTo);
+    }
+
 
     //  == OBJECT PROPERTIES & SIGNAL-HANDLERS ==
 
@@ -122,7 +126,7 @@ Item {
         if (Qt.platform.os === "ios" || Qt.platform.os === "android" || Qt.platform.os === "winrt") return;
 
         if (!bubble) return;
-        animateScalar(enteredFrom, enteredTo);
+        animateOver();
     }
 
     //  private variables
