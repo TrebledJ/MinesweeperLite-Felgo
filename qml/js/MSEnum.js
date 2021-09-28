@@ -7,7 +7,7 @@ class Difficulty {
     static get Advanced() { return "Advanced"; }
     static get Custom() { return "Custom"; }
 
-    static get list() { return [Difficulty.Beginner, Difficulty.Intermediate, Difficulty.Advanced, /*Difficulty.Custom*/]; }
+    static get list() { return [Difficulty.Beginner, Difficulty.Intermediate, Difficulty.Advanced, Difficulty.Custom]; }
     static get count() { return Difficulty.list.length; }
     static index(i) { return Difficulty.list[i]; }
 }
